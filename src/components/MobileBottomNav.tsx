@@ -1,0 +1,82 @@
+import React from 'react';
+import { Sparkles, ShoppingBag, Wallet, History, BookOpen, Info } from 'lucide-react';
+import { Language } from '../types';
+import { translations } from '../utils/translations';
+
+interface MobileBottomNavProps {
+  currentView: string;
+  onNavigate: (view: string) => void;
+  language: Language;
+}
+
+export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
+  currentView,
+  onNavigate,
+  language,
+}) => {
+  const t = translations[language];
+
+  const items = [
+    { id: 'home', label: t.navHome, icon: Sparkles },
+    { id: 'finance', label: 'Finansial', icon: Wallet },
+    { id: 'evaluate', label: 'Evaluasi', icon: ShoppingBag, isCenter: true },
+    { id: 'history', label: 'Riwayat', icon: History },
+    { id: 'education', label: 'Edukasi', icon: BookOpen },
+  ];
+
+  return (
+    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#F8F6F2]/95 backdrop-blur-lg border-t border-[#E2EAF0] shadow-lg px-2 py-1.5">
+      <div className="max-w-md mx-auto grid grid-cols-5 items-center">
+        {items.map((item) => {
+          const Icon = item.icon;
+          const isActive = currentView === item.id;
+
+          if (item.isCenter) {
+            return (
+              <button
+                key={item.id}
+                onClick={() => onNavigate(item.id)}
+                className="flex flex-col items-center justify-center -mt-5 relative group cursor-pointer"
+                title={item.label}
+              >
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-md transition-all ${
+                  isActive 
+                    ? 'bg-gradient-to-tr from-[#587893] to-[#6B8BA4] text-white ring-3 ring-white scale-105' 
+                    : 'bg-[#6B8BA4] text-white ring-2 ring-white hover:scale-105'
+                }`}>
+                  <Icon className="w-5 h-5 text-white" />
+                </div>
+                <span className={`text-[10px] font-bold mt-1 tracking-tight ${
+                  isActive ? 'text-[#24303E]' : 'text-[#6B8BA4]'
+                }`}>
+                  {item.label}
+                </span>
+              </button>
+            );
+          }
+
+          return (
+            <button
+              key={item.id}
+              onClick={() => onNavigate(item.id)}
+              className={`flex flex-col items-center justify-center py-1 rounded-xl transition-all cursor-pointer ${
+                isActive ? 'text-[#24303E]' : 'text-[#7A8C9E] hover:text-[#415364]'
+              }`}
+            >
+              <div className={`p-1 rounded-lg transition-colors ${
+                isActive ? 'bg-[#E2EAF0]' : 'bg-transparent'
+              }`}>
+                <Icon className={`w-4 h-4 ${isActive ? 'text-[#6B8BA4]' : 'text-[#8CA8BF]'}`} />
+              </div>
+              <span className={`text-[9px] font-semibold mt-0.5 leading-tight ${
+                isActive ? 'font-bold text-[#24303E]' : 'text-[#7A8C9E]'
+              }`}>
+                {item.label}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </nav>
+  );
+};

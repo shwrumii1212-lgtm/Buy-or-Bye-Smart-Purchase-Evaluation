@@ -1,0 +1,6 @@
+{
+  "name": "Buy or Bye - Smart Purchase Evaluation",
+  "description": "Platform evaluasi keputusan belanja cerdas bergaya e-commerce modern dengan analisis keuangan real-time dan rekomendasi bijak.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
