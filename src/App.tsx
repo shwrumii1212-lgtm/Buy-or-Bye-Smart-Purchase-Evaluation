@@ -27,7 +27,10 @@ import {
   getUserShoppingLog, 
   saveUserShoppingLog, 
   deleteShoppingLogItem,
-  DEMO_USER 
+  GUEST_USER,
+  resetGuestSession,
+  getUsers,
+  saveUser 
 } from './utils/storage';
 import { translations } from './utils/translations';
 import { 
@@ -83,6 +86,7 @@ export default function App() {
   };
 
   const handleLogout = () => {
+    resetGuestSession();
     setCurrentUser(null);
     setUser(null);
     setFinance(null);
@@ -113,22 +117,35 @@ export default function App() {
     status: 'bought' | 'saved_bye' | 'cooling_down'
   ) => {
     if (!user) return;
-    const newLog: ShoppingLogItem = {
-      id: `log_${Date.now()}`,
-      userId: user.id,
-      evaluationId: evalItem.id,
-      productName: evalItem.productName,
-      category: evalItem.category,
-      price: evalItem.price,
-      status,
-      date: new Date().toISOString(),
-      paymentMethod: evalItem.paymentMethod,
-      savedAmount: status === 'saved_bye' ? evalItem.price : 0,
-      notes: evalItem.reasons[0] || 'Tersimpan dari evaluasi Buy or Bye.'
-    };
 
-    saveUserShoppingLog(user.id, newLog);
-    setShoppingLog(prev => [newLog, ...prev]);
+    // Guard against accidental double clicks: update if same evaluationId already exists in recent history
+    setShoppingLog(prev => {
+      const existingIndex = prev.findIndex(item => item.evaluationId && item.evaluationId === evalItem.id);
+      
+      const newLog: ShoppingLogItem = {
+        id: existingIndex >= 0 ? prev[existingIndex].id : `log_${Date.now()}`,
+        userId: user.id,
+        evaluationId: evalItem.id,
+        productName: evalItem.productName,
+        category: evalItem.category,
+        price: evalItem.price,
+        status,
+        date: existingIndex >= 0 ? prev[existingIndex].date : new Date().toISOString(),
+        paymentMethod: evalItem.paymentMethod,
+        savedAmount: status === 'saved_bye' ? evalItem.price : 0,
+        notes: evalItem.reasons[0] || 'Tersimpan dari evaluasi Buy or Bye.'
+      };
+
+      saveUserShoppingLog(user.id, newLog);
+
+      if (existingIndex >= 0) {
+        // Update in-place so one evaluation action strictly yields one history entry
+        const updated = [...prev];
+        updated[existingIndex] = newLog;
+        return updated;
+      }
+      return [newLog, ...prev];
+    });
   };
 
   const handleAddManualShoppingItem = (item: ShoppingLogItem) => {
@@ -189,23 +206,23 @@ export default function App() {
                 Autentikasi Diperlukan
               </span>
               <h1 className="font-heading text-2xl sm:text-3xl font-extrabold text-[#24303E]">
-                Selamat Datang di Buy or Bye
+                Selamat Datang di <span className="text-[#16A34A]">Buy</span> <span className="text-black font-semibold">or</span> <span className="text-[#EC4899]">Bye</span>
               </h1>
               <p className="text-xs sm:text-sm text-[#5C6F80] max-w-md mx-auto leading-relaxed">
                 Silakan masuk atau buat akun terlebih dahulu untuk mengakses dashboard keuangan, evaluasi belanja, dan riwayat keputusanmu.
               </p>
             </div>
 
-            {/* Quick Demo Access and Auth Triggers */}
+            {/* Quick Guest Access and Auth Triggers */}
             <div className="pt-2 space-y-3">
               <button
                 onClick={() => {
-                  handleAuthSuccess(DEMO_USER);
+                  handleAuthSuccess(GUEST_USER);
                 }}
                 className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#6B8BA4] hover:bg-[#587893] text-white font-semibold text-xs shadow-md transition-all cursor-pointer"
               >
                 <UserCheck className="w-4 h-4" />
-                <span>Masuk Cepat dengan Akun Demo (Alya Putri)</span>
+                <span>{language === 'id' ? 'Masuk sebagai Guest (Coba Fitur Tanpa Registrasi)' : 'Continue as Guest (Try Features Without Sign-Up)'}</span>
               </button>
 
               <div className="flex gap-2">

@@ -6,13 +6,35 @@ const FINANCE_PREFIX = 'buy_or_bye_finance_v1_';
 const EVALS_PREFIX = 'buy_or_bye_evals_v1_';
 const HISTORY_PREFIX = 'buy_or_bye_history_v1_';
 
-export const DEMO_USER: User = {
-  id: 'usr_demo_alya',
-  name: 'Alya Putri',
-  email: 'alya@buyorbye.id',
-  avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
-  createdAt: '2026-01-15T09:00:00.000Z'
+export const GUEST_USER: User = {
+  id: 'usr_guest',
+  name: 'Tamu (Guest)',
+  email: 'guest@buyorbye.id',
+  createdAt: new Date().toISOString(),
+  isGuest: true
 };
+
+export const EMPTY_FINANCE: FinancialProfile = {
+  monthlyIncome: 0,
+  essentialExpenses: 0,
+  lifestyleExpenses: 0,
+  debtInstallments: 0,
+  savings: 0,
+  emergencyFund: 0,
+  emergencyTargetMonths: 6,
+  lastUpdated: new Date().toISOString()
+};
+
+// In-memory store for guest session (cleared on refresh or when guest session ends)
+let guestFinanceInMemory: FinancialProfile = { ...EMPTY_FINANCE };
+let guestEvaluationsInMemory: EvaluationItem[] = [];
+let guestShoppingLogInMemory: ShoppingLogItem[] = [];
+
+export function resetGuestSession(): void {
+  guestFinanceInMemory = { ...EMPTY_FINANCE };
+  guestEvaluationsInMemory = [];
+  guestShoppingLogInMemory = [];
+}
 
 export const DEMO_FINANCE: FinancialProfile = {
   monthlyIncome: 7500000, // Rp 7.500.000 (Gaji first-jobber / fresh graduate)
@@ -160,13 +182,11 @@ export function getUsers(): User[] {
   try {
     const raw = localStorage.getItem(USERS_KEY);
     if (!raw) {
-      const initial = [DEMO_USER];
-      localStorage.setItem(USERS_KEY, JSON.stringify(initial));
-      return initial;
+      return [];
     }
     return JSON.parse(raw);
   } catch {
-    return [DEMO_USER];
+    return [];
   }
 }
 
@@ -185,7 +205,13 @@ export function getCurrentUser(): User | null {
   try {
     const raw = localStorage.getItem(CURRENT_USER_KEY);
     if (!raw) return null;
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    if (parsed && parsed.isGuest) {
+      // Guests don't persist across refresh
+      localStorage.removeItem(CURRENT_USER_KEY);
+      return null;
+    }
+    return parsed;
   } catch {
     return null;
   }
@@ -193,51 +219,53 @@ export function getCurrentUser(): User | null {
 
 export function setCurrentUser(user: User | null): void {
   if (user) {
-    localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+    if (user.isGuest) {
+      // Guest session: do NOT persist in localStorage so refresh resets it
+      localStorage.removeItem(CURRENT_USER_KEY);
+    } else {
+      localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+    }
   } else {
     localStorage.removeItem(CURRENT_USER_KEY);
+    resetGuestSession();
   }
 }
 
 export function getUserFinance(userId: string): FinancialProfile {
+  if (userId === GUEST_USER.id) {
+    return guestFinanceInMemory;
+  }
+
   try {
     const raw = localStorage.getItem(`${FINANCE_PREFIX}${userId}`);
     if (!raw) {
-      if (userId === DEMO_USER.id) {
-        saveUserFinance(userId, DEMO_FINANCE);
-        return DEMO_FINANCE;
-      }
-      const defaultFinance: FinancialProfile = {
-        monthlyIncome: 6000000,
-        essentialExpenses: 3000000,
-        lifestyleExpenses: 1200000,
-        debtInstallments: 500000,
-        savings: 800000,
-        emergencyFund: 8000000,
-        emergencyTargetMonths: 6,
-        lastUpdated: new Date().toISOString()
-      };
-      saveUserFinance(userId, defaultFinance);
-      return defaultFinance;
+      // Clean empty initial finance without dummy numbers
+      const initialEmpty: FinancialProfile = { ...EMPTY_FINANCE };
+      saveUserFinance(userId, initialEmpty);
+      return initialEmpty;
     }
     return JSON.parse(raw);
   } catch {
-    return DEMO_FINANCE;
+    return { ...EMPTY_FINANCE };
   }
 }
 
 export function saveUserFinance(userId: string, profile: FinancialProfile): void {
+  if (userId === GUEST_USER.id) {
+    guestFinanceInMemory = { ...profile };
+    return;
+  }
   localStorage.setItem(`${FINANCE_PREFIX}${userId}`, JSON.stringify(profile));
 }
 
 export function getUserEvaluations(userId: string): EvaluationItem[] {
+  if (userId === GUEST_USER.id) {
+    return guestEvaluationsInMemory;
+  }
+
   try {
     const raw = localStorage.getItem(`${EVALS_PREFIX}${userId}`);
     if (!raw) {
-      if (userId === DEMO_USER.id) {
-        localStorage.setItem(`${EVALS_PREFIX}${userId}`, JSON.stringify(DEMO_EVALUATIONS));
-        return DEMO_EVALUATIONS;
-      }
       return [];
     }
     return JSON.parse(raw);
@@ -247,34 +275,77 @@ export function getUserEvaluations(userId: string): EvaluationItem[] {
 }
 
 export function saveUserEvaluation(userId: string, evaluation: EvaluationItem): void {
+  if (userId === GUEST_USER.id) {
+    guestEvaluationsInMemory.unshift(evaluation);
+    return;
+  }
   const evals = getUserEvaluations(userId);
-  evals.unshift(evaluation); // add newest to front
+  evals.unshift(evaluation);
   localStorage.setItem(`${EVALS_PREFIX}${userId}`, JSON.stringify(evals));
 }
 
 export function getUserShoppingLog(userId: string): ShoppingLogItem[] {
-  try {
-    const raw = localStorage.getItem(`${HISTORY_PREFIX}${userId}`);
-    if (!raw) {
-      if (userId === DEMO_USER.id) {
-        localStorage.setItem(`${HISTORY_PREFIX}${userId}`, JSON.stringify(DEMO_SHOPPING_LOG));
-        return DEMO_SHOPPING_LOG;
+  let list: ShoppingLogItem[] = [];
+  if (userId === GUEST_USER.id) {
+    list = guestShoppingLogInMemory;
+  } else {
+    try {
+      const raw = localStorage.getItem(`${HISTORY_PREFIX}${userId}`);
+      if (raw) {
+        list = JSON.parse(raw);
       }
-      return [];
+    } catch {
+      list = [];
     }
-    return JSON.parse(raw);
-  } catch {
-    return [];
   }
+
+  // Clean accidental duplicates from history while preserving valid transactions
+  const seenEvalIds = new Set<string>();
+  const seenKeys = new Set<string>();
+  const cleaned: ShoppingLogItem[] = [];
+  for (const item of list) {
+    if (item.evaluationId) {
+      if (seenEvalIds.has(item.evaluationId)) continue;
+      seenEvalIds.add(item.evaluationId);
+    } else {
+      const key = `${item.productName}_${item.price}_${(item.date || '').substring(0, 16)}`;
+      if (seenKeys.has(key)) continue;
+      seenKeys.add(key);
+    }
+    cleaned.push(item);
+  }
+  return cleaned;
 }
 
 export function saveUserShoppingLog(userId: string, item: ShoppingLogItem): void {
+  if (userId === GUEST_USER.id) {
+    // Prevent duplicate evaluation entries for guest
+    if (item.evaluationId) {
+      const idx = guestShoppingLogInMemory.findIndex(i => i.evaluationId === item.evaluationId);
+      if (idx >= 0) {
+        guestShoppingLogInMemory[idx] = item;
+        return;
+      }
+    }
+    guestShoppingLogInMemory.unshift(item);
+    return;
+  }
   const logs = getUserShoppingLog(userId);
-  logs.unshift(item);
+  // If item already exists with the same ID or same evaluationId, update instead of duplicating
+  const existingIdx = logs.findIndex(i => (item.evaluationId && i.evaluationId === item.evaluationId) || i.id === item.id);
+  if (existingIdx >= 0) {
+    logs[existingIdx] = item;
+  } else {
+    logs.unshift(item);
+  }
   localStorage.setItem(`${HISTORY_PREFIX}${userId}`, JSON.stringify(logs));
 }
 
 export function deleteShoppingLogItem(userId: string, logId: string): void {
+  if (userId === GUEST_USER.id) {
+    guestShoppingLogInMemory = guestShoppingLogInMemory.filter(item => item.id !== logId);
+    return;
+  }
   const logs = getUserShoppingLog(userId).filter(item => item.id !== logId);
   localStorage.setItem(`${HISTORY_PREFIX}${userId}`, JSON.stringify(logs));
 }

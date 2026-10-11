@@ -14,6 +14,7 @@ export type PaymentMethod =
   | 'cash' 
   | 'debit' 
   | 'credit_card' 
+  | 'savings'
   | 'paylater';
 
 export type DecisionVerdict = 'BUY' | 'BYE' | 'COOLING_OFF';
@@ -24,6 +25,7 @@ export interface User {
   email: string;
   avatar?: string;
   createdAt: string;
+  isGuest?: boolean;
 }
 
 export interface FinancialProfile {

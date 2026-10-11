@@ -41,10 +41,29 @@ export const ShoppingLogView: React.FC<ShoppingLogViewProps> = ({
   onAddItem,
   onDeleteItem,
 }) => {
+  const monthsList = [
+    { val: 'all' as const, labelId: 'Semua Bulan', labelEn: 'All Months' },
+    { val: 0, labelId: 'Januari', labelEn: 'January' },
+    { val: 1, labelId: 'Februari', labelEn: 'February' },
+    { val: 2, labelId: 'Maret', labelEn: 'March' },
+    { val: 3, labelId: 'April', labelEn: 'April' },
+    { val: 4, labelId: 'Mei', labelEn: 'May' },
+    { val: 5, labelId: 'Juni', labelEn: 'June' },
+    { val: 6, labelId: 'Juli', labelEn: 'July' },
+    { val: 7, labelId: 'Agustus', labelEn: 'August' },
+    { val: 8, labelId: 'September', labelEn: 'September' },
+    { val: 9, labelId: 'Oktober', labelEn: 'October' },
+    { val: 10, labelId: 'November', labelEn: 'November' },
+    { val: 11, labelId: 'Desember', labelEn: 'December' },
+  ];
+  const yearsList = [2024, 2025, 2026, 2027];
+
+  const now = new Date();
   const [modalOpen, setModalOpen] = useState(false);
   const [downloadingPdf, setDownloadingPdf] = useState(false);
   const [statusFilter, setStatusFilter] = useState<'all' | 'bought' | 'saved_bye' | 'cooling_down'>('all');
-  const [monthFilter, setMonthFilter] = useState<'all' | 'current' | 'previous'>('all');
+  const [selectedYear, setSelectedYear] = useState<number>(now.getFullYear());
+  const [selectedMonth, setSelectedMonth] = useState<number | 'all'>('all');
 
   const t = translations[language];
 
@@ -57,26 +76,18 @@ export const ShoppingLogView: React.FC<ShoppingLogViewProps> = ({
     }
   };
 
-  // Current month vs previous month date math
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonthIdx = now.getMonth();
-
   const filteredItems = items.filter((item) => {
     // Status filter
     if (statusFilter !== 'all' && item.status !== statusFilter) {
       return false;
     }
 
-    // Month filter
-    if (monthFilter !== 'all') {
-      const itemDate = new Date(item.date);
-      const isCur = itemDate.getFullYear() === currentYear && itemDate.getMonth() === currentMonthIdx;
-      if (monthFilter === 'current' && !isCur) return false;
-      if (monthFilter === 'previous' && isCur) return false;
-    }
+    // Month & Year filter
+    const itemDate = new Date(item.date);
+    const yearMatch = itemDate.getFullYear() === selectedYear;
+    const monthMatch = selectedMonth === 'all' || itemDate.getMonth() === selectedMonth;
 
-    return true;
+    return yearMatch && monthMatch;
   });
 
   // Calculate totals
@@ -196,44 +207,69 @@ export const ShoppingLogView: React.FC<ShoppingLogViewProps> = ({
         </div>
       </div>
 
-      {/* Habit Pattern & Smart Coaching Insights */}
+      {/* Habit Pattern & Smart Coaching Insights (Point 10: Real data or inform not enough data) */}
       <section className="p-6 sm:p-8 rounded-3xl bg-[#F8F6F2] border border-[#E2EAF0] space-y-4">
-        <div className="flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-[#6B8BA4]" />
-          <h2 className="font-heading text-base font-bold text-[#24303E]">
-            {t.patternAnalysisTitle}
-          </h2>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-[#6B8BA4]" />
+            <h2 className="font-heading text-base font-bold text-[#24303E]">
+              {t.patternAnalysisTitle}
+            </h2>
+          </div>
+          <span className="text-[11px] text-[#7A8C9E]">
+            {items.length >= 3 
+              ? (language === 'id' ? 'Berdasarkan Data Riil' : 'Based on Real Records') 
+              : (language === 'id' ? 'Data Belum Cukup' : 'Insufficient Data')}
+          </span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          
-          <div className="p-4 rounded-2xl bg-white border border-[#E5ECF2] space-y-1">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-[#7A8C9E]">{t.patternHabit1}</p>
-            <p className="text-xl font-heading font-extrabold text-[#24303E]">{byeRatio}% Lolos dari Impuls</p>
-            <p className="text-xs text-[#5C6F80]">
-              {byeRatio >= 50 
-                ? 'Disiplin sangat baik! Kamu berhasil membatalkan lebih dari separuh keinginan impulsif.' 
-                : 'Masih sering tergiur. Berikan jeda 24 jam ekstra sebelum memutuskan checkout.'}
+        {items.length < 3 ? (
+          <div className="p-6 rounded-2xl bg-white border border-[#E5ECF2] text-center space-y-2">
+            <Lightbulb className="w-6 h-6 text-[#6B8BA4] mx-auto" />
+            <h3 className="font-heading font-bold text-sm text-[#24303E]">
+              {language === 'id' ? 'Data Belum Cukup untuk Analisis Pola' : 'Not Enough Data for Pattern Analysis'}
+            </h3>
+            <p className="text-xs text-[#5C6F80] max-w-md mx-auto">
+              {language === 'id'
+                ? `Kamu baru memiliki ${items.length} catatan transaksi. Analisis kebiasaan belanja yang akurat membutuhkan minimal 3 transaksi nyata. Terus catat atau evaluasi barang baru untuk membuka rekomendasi cerdas!`
+                : `You currently have ${items.length} logged transactions. Mindful pattern coaching requires at least 3 genuine records. Keep evaluating products to unlock personalized insights!`}
             </p>
           </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            
+            <div className="p-4 rounded-2xl bg-white border border-[#E5ECF2] space-y-1">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-[#7A8C9E]">{t.patternHabit1}</p>
+              <p className="text-xl font-heading font-extrabold text-[#24303E]">{byeRatio}% {language === 'id' ? 'Lolos dari Impuls' : 'Impulse Resisted'}</p>
+              <p className="text-xs text-[#5C6F80]">
+                {byeRatio >= 50 
+                  ? (language === 'id' ? 'Disiplin sangat baik! Kamu berhasil membatalkan lebih dari separuh keinginan impulsif.' : 'High discipline! You successfully paused or skipped over half of impulse temptations.')
+                  : (language === 'id' ? 'Masih sering tergiur. Berikan jeda 24 jam ekstra sebelum memutuskan checkout.' : 'Temptation rate is high. Enforce a strict 24-hour cooling-off window before checkout.')}
+              </p>
+            </div>
 
-          <div className="p-4 rounded-2xl bg-white border border-[#E5ECF2] space-y-1">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-[#7A8C9E]">{t.patternHabit2}</p>
-            <p className="text-xl font-heading font-extrabold text-[#D8A4B8]">{topCategoryName}</p>
-            <p className="text-xs text-[#5C6F80]">
-              Kategori yang paling sering menarik perhatianmu. Berikan perhatian khusus pada kategori ini saat ada flash sale.
-            </p>
+            <div className="p-4 rounded-2xl bg-white border border-[#E5ECF2] space-y-1">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-[#7A8C9E]">{t.patternHabit2}</p>
+              <p className="text-xl font-heading font-extrabold text-[#E11D48]">{topCategoryName}</p>
+              <p className="text-xs text-[#5C6F80]">
+                {language === 'id'
+                  ? 'Kategori yang paling sering menarik perhatianmu. Berikan perhatian khusus pada kategori ini saat ada flash sale.'
+                  : 'Your most frequent category. Pay special attention to this category during seasonal sales.'}
+              </p>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-white border border-[#E5ECF2] space-y-1">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-[#7A8C9E]">{t.patternHabit3}</p>
+              <p className="text-sm font-bold text-[#6B8BA4]">{language === 'id' ? 'Aturan 30 Hari Sinking Fund' : '30-Day Sinking Fund Rule'}</p>
+              <p className="text-xs text-[#5C6F80]">
+                {language === 'id'
+                  ? 'Bila ada barang non-pokok berharga >Rp 500.000, tabung dulu 50% selama 1 bulan sebelum mengevaluasinya kembali.'
+                  : 'For discretionary items over IDR 500,000, accumulate 50% in advance over 30 days before checkout.'}
+              </p>
+            </div>
+
           </div>
-
-          <div className="p-4 rounded-2xl bg-white border border-[#E5ECF2] space-y-1">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-[#7A8C9E]">{t.patternHabit3}</p>
-            <p className="text-sm font-bold text-[#6B8BA4]">Aturan 30 Hari Sinking Fund</p>
-            <p className="text-xs text-[#5C6F80]">
-              Bila ada barang non-pokok berharga &gt;Rp 500.000, tabung dulu 50% selama 1 bulan sebelum mengevaluasinya kembali.
-            </p>
-          </div>
-
-        </div>
+        )}
       </section>
 
       {/* Filter and Table List */}
@@ -242,11 +278,11 @@ export const ShoppingLogView: React.FC<ShoppingLogViewProps> = ({
         {/* Filter controls */}
         <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-[#E2EAF0]">
           
-          {/* Status filters */}
+          {/* Status filters (BUY green, BYE red) */}
           <div className="flex flex-wrap items-center gap-1.5">
             <button
               onClick={() => setStatusFilter('all')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
+              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
                 statusFilter === 'all' ? 'bg-[#6B8BA4] text-white' : 'bg-[#F8F6F2] text-[#55697A] hover:bg-[#EFECE6]'
               }`}
             >
@@ -254,42 +290,63 @@ export const ShoppingLogView: React.FC<ShoppingLogViewProps> = ({
             </button>
             <button
               onClick={() => setStatusFilter('bought')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
-                statusFilter === 'bought' ? 'bg-[#9EAEA2] text-white' : 'bg-[#F8F6F2] text-[#55697A] hover:bg-[#EFECE6]'
+              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
+                statusFilter === 'bought' ? 'bg-[#059669] text-white font-bold' : 'bg-[#F8F6F2] text-[#55697A] hover:bg-[#EFECE6]'
               }`}
             >
               {t.filterBought} ({items.filter(i => i.status === 'bought').length})
             </button>
             <button
               onClick={() => setStatusFilter('saved_bye')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
-                statusFilter === 'saved_bye' ? 'bg-[#D8A4B8] text-white' : 'bg-[#F8F6F2] text-[#55697A] hover:bg-[#EFECE6]'
+              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
+                statusFilter === 'saved_bye' ? 'bg-[#E11D48] text-white font-bold' : 'bg-[#F8F6F2] text-[#55697A] hover:bg-[#EFECE6]'
               }`}
             >
               {t.filterSaved} ({items.filter(i => i.status === 'saved_bye').length})
             </button>
             <button
               onClick={() => setStatusFilter('cooling_down')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
-                statusFilter === 'cooling_down' ? 'bg-[#9B8EA9] text-white' : 'bg-[#F8F6F2] text-[#55697A] hover:bg-[#EFECE6]'
+              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
+                statusFilter === 'cooling_down' ? 'bg-[#6366F1] text-white font-bold' : 'bg-[#F8F6F2] text-[#55697A] hover:bg-[#EFECE6]'
               }`}
             >
               {t.filterCooling} ({items.filter(i => i.status === 'cooling_down').length})
             </button>
           </div>
 
-          {/* Month filter */}
-          <div className="flex items-center gap-1.5 text-xs">
-            <Calendar className="w-3.5 h-3.5 text-[#7A8C9E]" />
-            <select
-              value={monthFilter}
-              onChange={(e) => setMonthFilter(e.target.value as any)}
-              className="px-2.5 py-1.5 rounded-lg border border-[#D5DFE7] bg-[#F8F6F2] text-xs font-medium"
-            >
-              <option value="all">Semua Periode</option>
-              <option value="current">{t.currentMonth}</option>
-              <option value="previous">{t.previousMonth}</option>
-            </select>
+          {/* Month & Year filter (Point 10) */}
+          <div className="flex flex-wrap items-center gap-2 text-xs">
+            {/* Year */}
+            <div className="flex items-center gap-1 bg-[#F8F6F2] px-2.5 py-1.5 rounded-lg border border-[#D5DFE7]">
+              <Calendar className="w-3.5 h-3.5 text-[#6B8BA4]" />
+              <select
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(Number(e.target.value))}
+                className="bg-transparent text-xs font-bold text-[#24303E] outline-none cursor-pointer"
+              >
+                {yearsList.map(y => (
+                  <option key={y} value={y}>{y}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Month */}
+            <div className="bg-[#F8F6F2] px-2.5 py-1.5 rounded-lg border border-[#D5DFE7]">
+              <select
+                value={selectedMonth}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setSelectedMonth(val === 'all' ? 'all' : Number(val));
+                }}
+                className="bg-transparent text-xs font-semibold text-[#24303E] outline-none cursor-pointer"
+              >
+                {monthsList.map(m => (
+                  <option key={String(m.val)} value={m.val}>
+                    {language === 'id' ? m.labelId : m.labelEn}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
         </div>
@@ -343,18 +400,18 @@ export const ShoppingLogView: React.FC<ShoppingLogViewProps> = ({
                           </td>
                           <td className="px-6 py-4">
                             {isBought && (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#EAF0EB] text-[#47634F] font-bold text-[11px]">
-                                <CheckCircle2 className="w-3 h-3" /> Dibeli
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#ECFDF5] text-[#065F46] border border-[#10B981] font-bold text-[11px]">
+                                <CheckCircle2 className="w-3 h-3 text-[#059669]" /> {language === 'id' ? 'DIBELI (BUY)' : 'BOUGHT'}
                               </span>
                             )}
                             {isSaved && (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#FBF1F5] text-[#8E4362] font-bold text-[11px]">
-                                <XCircle className="w-3 h-3" /> BYE (Tersimpan)
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#FFF1F2] text-[#9F1239] border border-[#F43F5E] font-bold text-[11px]">
+                                <XCircle className="w-3 h-3 text-[#E11D48]" /> {language === 'id' ? 'BYE (HEMAT)' : 'BYE (SAVED)'}
                               </span>
                             )}
                             {isCooling && (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#F3EFF7] text-[#59496A] font-bold text-[11px]">
-                                <Clock className="w-3 h-3" /> Daftar Tunda
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#EEF2FF] text-[#3730A3] border border-[#818CF8] font-bold text-[11px]">
+                                <Clock className="w-3 h-3 text-[#6366F1]" /> {language === 'id' ? 'TUNDA (COOLING)' : 'COOLING OFF'}
                               </span>
                             )}
                           </td>
@@ -422,18 +479,18 @@ export const ShoppingLogView: React.FC<ShoppingLogViewProps> = ({
 
                       <div className="text-right">
                         {isBought && (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#EAF0EB] text-[#47634F] font-bold text-[10px]">
-                            <CheckCircle2 className="w-3 h-3" /> Dibeli
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#ECFDF5] text-[#065F46] border border-[#10B981] font-bold text-[10px]">
+                            <CheckCircle2 className="w-3 h-3 text-[#059669]" /> {language === 'id' ? 'DIBELI' : 'BOUGHT'}
                           </span>
                         )}
                         {isSaved && (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#FBF1F5] text-[#8E4362] font-bold text-[10px]">
-                            <XCircle className="w-3 h-3" /> BYE
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#FFF1F2] text-[#9F1239] border border-[#F43F5E] font-bold text-[10px]">
+                            <XCircle className="w-3 h-3 text-[#E11D48]" /> {language === 'id' ? 'BYE' : 'BYE'}
                           </span>
                         )}
                         {isCooling && (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#F3EFF7] text-[#59496A] font-bold text-[10px]">
-                            <Clock className="w-3 h-3" /> Ditunda
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#EEF2FF] text-[#3730A3] border border-[#818CF8] font-bold text-[10px]">
+                            <Clock className="w-3 h-3 text-[#6366F1]" /> {language === 'id' ? 'TUNDA' : 'PAUSED'}
                           </span>
                         )}
                         <span className="text-[10px] text-[#7A8C9E] block mt-0.5">

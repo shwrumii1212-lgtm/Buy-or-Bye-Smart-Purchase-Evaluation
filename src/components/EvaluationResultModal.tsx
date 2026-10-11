@@ -60,36 +60,36 @@ export const EvaluationResultModal: React.FC<EvaluationResultModalProps> = ({
     }, 1200);
   };
 
-  // Color scheme based on verdict (Soft Summer)
+  // Color scheme based on verdict (BUY always green, BYE always red - Soft Summer Palette)
   const isBuy = evaluation.decision === 'BUY';
   const isBye = evaluation.decision === 'BYE';
   const isCooling = evaluation.decision === 'COOLING_OFF';
 
   const verdictTheme = isBuy 
     ? {
-        bgGradient: 'from-[#9EAEA2] via-[#8AA090] to-[#7E9383]',
-        badgeBg: 'bg-[#EAF0EB]',
-        textColor: 'text-[#47634F]',
-        borderColor: 'border-[#9EAEA2]',
+        bgGradient: 'from-[#059669] via-[#10B981] to-[#047857]',
+        badgeBg: 'bg-[#ECFDF5]',
+        textColor: 'text-[#065F46]',
+        borderColor: 'border-[#10B981]',
         title: t.verdictBuyTitle,
         subtitle: t.verdictBuySub,
         icon: CheckCircle2
       }
     : isBye
     ? {
-        bgGradient: 'from-[#D8A4B8] via-[#C88FA6] to-[#B87A94]',
-        badgeBg: 'bg-[#FBF1F5]',
-        textColor: 'text-[#8E4362]',
-        borderColor: 'border-[#D8A4B8]',
+        bgGradient: 'from-[#E11D48] via-[#F43F5E] to-[#BE123C]',
+        badgeBg: 'bg-[#FFF1F2]',
+        textColor: 'text-[#9F1239]',
+        borderColor: 'border-[#F43F5E]',
         title: t.verdictByeTitle,
         subtitle: t.verdictByeSub,
         icon: XCircle
       }
     : {
-        bgGradient: 'from-[#9B8EA9] via-[#8C7E9C] to-[#7D6E8E]',
-        badgeBg: 'bg-[#F3EFF7]',
-        textColor: 'text-[#59496A]',
-        borderColor: 'border-[#9B8EA9]',
+        bgGradient: 'from-[#6366F1] via-[#818CF8] to-[#4F46E5]',
+        badgeBg: 'bg-[#EEF2FF]',
+        textColor: 'text-[#3730A3]',
+        borderColor: 'border-[#818CF8]',
         title: t.verdictCoolingTitle,
         subtitle: t.verdictCoolingSub,
         icon: Clock
@@ -297,7 +297,7 @@ export const EvaluationResultModal: React.FC<EvaluationResultModalProps> = ({
                 {isBuy && (
                   <button
                     onClick={() => handleSaveAction('bought')}
-                    className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#7E9383] hover:bg-[#6D8072] text-white text-xs font-semibold shadow-xs"
+                    className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#059669] hover:bg-[#047857] text-white text-xs font-semibold shadow-xs transition-colors"
                   >
                     <CheckCircle2 className="w-4 h-4" />
                     <span>{t.historyStatusBought}</span>
@@ -307,7 +307,7 @@ export const EvaluationResultModal: React.FC<EvaluationResultModalProps> = ({
                 {isBye && (
                   <button
                     onClick={() => handleSaveAction('saved_bye')}
-                    className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#D8A4B8] hover:bg-[#C88FA6] text-white text-xs font-semibold shadow-xs"
+                    className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs font-semibold shadow-xs transition-colors"
                   >
                     <XCircle className="w-4 h-4" />
                     <span>{t.historyStatusSaved}</span>

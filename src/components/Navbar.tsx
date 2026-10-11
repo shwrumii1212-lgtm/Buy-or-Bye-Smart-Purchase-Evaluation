@@ -44,9 +44,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   const t = translations[language];
 
   const navItems = [
-    { id: 'home', label: t.navHome, icon: Sparkles },
-    { id: 'evaluate', label: t.navEvaluate, icon: ShoppingBag },
     { id: 'finance', label: t.navFinance, icon: Wallet },
+    { id: 'evaluate', label: t.navEvaluate, icon: ShoppingBag },
     { id: 'monthly-report', label: t.navMonthlyReport, icon: BarChart3 },
     { id: 'history', label: t.navHistory, icon: History },
     { id: 'education', label: t.navEducation, icon: BookOpen },
@@ -72,8 +71,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               <ShoppingBag className="w-5 h-5 text-white" />
             </div>
             <div>
-              <span className="font-heading font-extrabold text-xl tracking-tight text-[#24303E]">
-                Buy <span className="text-[#9EAEA2] font-normal">or</span> <span className="text-[#D8A4B8]">Bye</span>
+              <span className="font-heading font-extrabold text-xl tracking-tight">
+                <span className="text-[#16A34A]">Buy</span> <span className="text-black font-normal">or</span> <span className="text-[#EC4899]">Bye</span>
               </span>
               <p className="text-[10px] uppercase font-semibold tracking-wider text-[#6B8BA4] hidden sm:block">
                 Decision Gatekeeper
@@ -144,66 +143,26 @@ export const Navbar: React.FC<NavbarProps> = ({
                   </div>
                 </button>
 
-                {/* Dropdown Menu */}
+                {/* Dropdown Menu - Profil hanya menampilkan nama, email, dan Logout */}
                 {userDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-56 rounded-xl bg-white border border-[#E2EAF0] shadow-lg py-1.5 z-50 text-xs">
-                    <div className="px-3 py-2 border-b border-[#F0F4F7]">
-                      <p className="font-semibold text-[#24303E]">{user.name}</p>
-                      <p className="text-[11px] text-[#7A8C9E] truncate">{user.email}</p>
+                  <div className="absolute right-0 mt-2 w-52 rounded-xl bg-white border border-[#E2EAF0] shadow-lg py-2 z-50 text-xs animate-in fade-in">
+                    <div className="px-3.5 py-2 border-b border-[#F0F4F7]">
+                      <p className="font-bold text-[#24303E] text-sm leading-tight">{user.name}</p>
+                      <p className="text-[11px] text-[#7A8C9E] truncate mt-0.5">{user.email}</p>
                     </div>
 
-                    {finance && (
-                      <div className="px-3 py-2 bg-[#F8F6F2] border-b border-[#F0F4F7]">
-                        <p className="text-[10px] text-[#7A8C9E] uppercase font-semibold">Uang Bebas Bulanan</p>
-                        <p className="text-xs font-bold text-[#6B8BA4]">
-                          Rp {Math.max(0, finance.monthlyIncome - (finance.essentialExpenses + finance.lifestyleExpenses + finance.debtInstallments + finance.savings)).toLocaleString('id-ID')}
-                        </p>
-                      </div>
-                    )}
-
-                    <button
-                      onClick={() => {
-                        handleNavClick('finance');
-                        setUserDropdownOpen(false);
-                      }}
-                      className="w-full text-left px-3 py-2 text-[#415364] hover:bg-[#F2F6F9] flex items-center gap-2"
-                    >
-                      <Wallet className="w-3.5 h-3.5 text-[#6B8BA4]" />
-                      <span>{t.navFinance}</span>
-                    </button>
-                    <button
-                      onClick={() => {
-                        handleNavClick('monthly-report');
-                        setUserDropdownOpen(false);
-                      }}
-                      className="w-full text-left px-3 py-2 text-[#415364] hover:bg-[#F2F6F9] flex items-center gap-2"
-                    >
-                      <BarChart3 className="w-3.5 h-3.5 text-[#6B8BA4]" />
-                      <span>{t.navMonthlyReport}</span>
-                    </button>
-                    <button
-                      onClick={() => {
-                        handleNavClick('history');
-                        setUserDropdownOpen(false);
-                      }}
-                      className="w-full text-left px-3 py-2 text-[#415364] hover:bg-[#F2F6F9] flex items-center gap-2"
-                    >
-                      <History className="w-3.5 h-3.5 text-[#6B8BA4]" />
-                      <span>{t.navHistory}</span>
-                    </button>
-                    
-                    <div className="border-t border-[#F0F4F7] my-1" />
-
-                    <button
-                      onClick={() => {
-                        setUserDropdownOpen(false);
-                        onLogout();
-                      }}
-                      className="w-full text-left px-3 py-2 text-[#C487A0] hover:bg-[#FFF5F8] flex items-center gap-2 font-medium"
-                    >
-                      <LogOut className="w-3.5 h-3.5 text-[#D8A4B8]" />
-                      <span>{t.logout}</span>
-                    </button>
+                    <div className="pt-1">
+                      <button
+                        onClick={() => {
+                          setUserDropdownOpen(false);
+                          onLogout();
+                        }}
+                        className="w-full text-left px-3.5 py-2 text-[#C487A0] hover:bg-[#FFF5F8] flex items-center gap-2 font-semibold transition-colors cursor-pointer"
+                      >
+                        <LogOut className="w-3.5 h-3.5 text-[#D8A4B8]" />
+                        <span>{t.logout}</span>
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>

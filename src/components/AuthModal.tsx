@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { X, Lock, Mail, User as UserIcon, Sparkles, CheckCircle2, ArrowRight } from 'lucide-react';
 import { Language, User } from '../types';
 import { translations } from '../utils/translations';
-import { DEMO_USER, getUsers, saveUser, setCurrentUser } from '../utils/storage';
+import { GUEST_USER, getUsers, saveUser, setCurrentUser } from '../utils/storage';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -29,15 +29,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   if (!isOpen) return null;
   const t = translations[language];
 
-  const handleUseDemo = () => {
+  const handleUseGuest = () => {
     setLoading(true);
     setTimeout(() => {
-      saveUser(DEMO_USER);
-      setCurrentUser(DEMO_USER);
-      onAuthSuccess(DEMO_USER);
+      // Guest user is not stored in localStorage, keeps data in memory for this session
+      setCurrentUser(GUEST_USER);
+      onAuthSuccess(GUEST_USER);
       setLoading(false);
       onClose();
-    }, 300);
+    }, 250);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -136,20 +136,26 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           </p>
         </div>
 
-        {/* Quick Demo Fill button */}
+        {/* Guest Mode Entry */}
         <div className="px-6 pt-5 pb-1">
           <button
             type="button"
-            onClick={handleUseDemo}
-            className="w-full flex items-center justify-between p-3 rounded-xl bg-[#F8F6F2] hover:bg-[#EFECE6] border border-[#DDE4EB] transition-colors text-left group"
+            onClick={handleUseGuest}
+            className="w-full flex items-center justify-between p-3.5 rounded-xl bg-[#F8F6F2] hover:bg-[#EFECE6] border border-[#DDE4EB] transition-colors text-left group cursor-pointer"
           >
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-lg bg-[#6B8BA4]/15 flex items-center justify-center text-[#6B8BA4]">
                 <CheckCircle2 className="w-4 h-4" />
               </div>
               <div>
-                <p className="text-xs font-bold text-[#24303E]">{t.demoAccount}</p>
-                <p className="text-[11px] text-[#718597]">Alya Putri (First Jobber · Data Lengkap)</p>
+                <p className="text-xs font-bold text-[#24303E]">
+                  {language === 'id' ? 'Masuk sebagai Guest' : 'Continue as Guest'}
+                </p>
+                <p className="text-[11px] text-[#718597]">
+                  {language === 'id' 
+                    ? 'Coba fitur tanpa registrasi (data sementara akan reset saat refresh)' 
+                    : 'Try features without sign-up (session data clears upon refresh)'}
+                </p>
               </div>
             </div>
             <ArrowRight className="w-4 h-4 text-[#6B8BA4] transition-transform group-hover:translate-x-1" />
@@ -161,7 +167,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             </div>
             <div className="relative flex justify-center text-[11px] uppercase">
               <span className="bg-white px-3 text-[#8A9BA8] font-medium">
-                {language === 'id' ? 'atau isi formulir' : 'or enter credentials'}
+                {language === 'id' ? 'atau akun terdaftar' : 'or registered account'}
               </span>
             </div>
           </div>

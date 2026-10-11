@@ -13,6 +13,12 @@ export interface EvaluationInput {
   hasSimilarItem: boolean;
   usedFrequency: 'daily' | 'weekly' | 'monthly' | 'rarely';
   coolingOffPassed: boolean;
+  // Enhanced 5 psychological test answers
+  psyDiscountTrap?: 'just_because_sale' | 'planned_long_ago';
+  psyFomoPressure?: 'saw_on_social' | 'personal_need';
+  psyNeedVsWant?: 'essential_need' | 'lifestyle_want';
+  psyDelayReady?: 'ready_to_wait' | 'urge_to_checkout_now';
+  psyPostPurchaseMood?: 'guilt_potential' | 'confident_useful';
 }
 
 export function runRuleBasedEvaluation(
@@ -32,7 +38,12 @@ export function runRuleBasedEvaluation(
     urgencyScore,
     hasSimilarItem,
     usedFrequency,
-    coolingOffPassed
+    coolingOffPassed,
+    psyDiscountTrap,
+    psyFomoPressure,
+    psyNeedVsWant,
+    psyDelayReady,
+    psyPostPurchaseMood,
   } = input;
 
   const monthlyIncome = finance.monthlyIncome || 1;
@@ -138,7 +149,7 @@ export function runRuleBasedEvaluation(
     );
   }
 
-  // Factor C: Paylater & Debt Service Ratio (DSR) Risk
+  // Factor C: Payment Method Risk Evaluation
   if (paymentMethod === 'paylater') {
     if (debtRatioAfter > 35) {
       score -= 30;
@@ -160,6 +171,77 @@ export function runRuleBasedEvaluation(
           : `Paylater adds extra financing costs and commits your income for the next ${paylaterTenorMonths} months.`
       );
     }
+  } else if (paymentMethod === 'savings') {
+    // Checking impact on user's savings buffer
+    if (price > savings * 3 && savings > 0) {
+      score -= 10;
+      reasons.push(
+        lang === 'id'
+          ? `Menggunakan sumber tabungan untuk belanja konsumtif menggerus modal masa depanmu.`
+          : `Drawing from your personal savings directly cuts into your long-term wealth compounding.`
+      );
+    } else {
+      reasons.push(
+        lang === 'id'
+          ? `Pembayaran menggunakan alokasi tabungan bebas tanpa bunga utang.`
+          : `Paid from saved funds with zero debt obligations.`
+      );
+    }
+  } else if (paymentMethod === 'credit_card') {
+    reasons.push(
+      lang === 'id'
+        ? `Pembayaran dengan kartu kredit wajib dilunasi penuh saat tanggal jatuh tempo bulan depan agar tidak terkena bunga bergulir.`
+        : `Credit card purchases must be settled in full on the next due date to prevent interest accrual.`
+    );
+  }
+
+  // Factor G: 5 Psychology & Mindset Checks
+  if (psyDiscountTrap === 'just_because_sale') {
+    score -= 12;
+    reasons.push(
+      lang === 'id'
+        ? `Uji Diskon: Tertarik terutama karena ada potongan harga atau promo sesaat, bukan karena kebutuhan terencana.`
+        : `Discount Trap: Triggered primarily by markdown marketing rather than a premeditated need.`
+    );
+  } else if (psyDiscountTrap === 'planned_long_ago') {
+    score += 8;
+  }
+
+  if (psyFomoPressure === 'saw_on_social') {
+    score -= 12;
+    reasons.push(
+      lang === 'id'
+        ? `Uji FOMO: Keinginan dipicu oleh tren media sosial atau rasa takut ketinggalan (FOMO).`
+        : `FOMO Check: Purchase intent stimulated by social media hype or peer pressure.`
+    );
+  } else if (psyFomoPressure === 'personal_need') {
+    score += 6;
+  }
+
+  if (psyNeedVsWant === 'lifestyle_want') {
+    score -= 8;
+  } else if (psyNeedVsWant === 'essential_need') {
+    score += 12;
+  }
+
+  if (psyDelayReady === 'urge_to_checkout_now') {
+    score -= 10;
+    reasons.push(
+      lang === 'id'
+        ? `Uji Menunda: Ada dorongan menggebu untuk checkout seketika tanpa jeda rasionalisasi.`
+        : `Delay Resistance: High impatience indicating acute dopamine rush.`
+    );
+  } else if (psyDelayReady === 'ready_to_wait') {
+    score += 8;
+  }
+
+  if (psyPostPurchaseMood === 'guilt_potential') {
+    score -= 12;
+    reasons.push(
+      lang === 'id'
+        ? `Refleksi Emosi: Kamu mengantisipasi potensi rasa bersalah setelah membuka paket.`
+        : `Emotional Reflection: High anticipation of buyer remorse after unboxing.`
+    );
   }
 
   // Factor D: Urgency & Utility

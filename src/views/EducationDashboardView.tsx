@@ -41,44 +41,107 @@ export const EducationDashboardView: React.FC<EducationDashboardViewProps> = ({
   const [articleSearch, setArticleSearch] = useState<string>('');
   const [selectedArticle, setSelectedArticle] = useState<EducationalArticle | null>(null);
 
-  // Mini Quiz state for Needs vs Wants
+  // Mini Quiz state for 5 Key Financial & Behavioral Literacy Domains
   const [quizScore, setQuizScore] = useState(0);
-  const [answeredMap, setAnsweredMap] = useState<Record<number, boolean>>({});
+  const [answeredMap, setAnsweredMap] = useState<Record<number, { selectedId: string; isCorrect: boolean }>>({});
 
   const quizQuestions = [
     {
       id: 1,
-      item: 'Laptop baru spesifikasi gaming seharga Rp 22 juta untuk mahasiswa jurusan sastra yang laptop lamanya masih berjalan normal.',
-      itemEn: 'A high-end $1,500 gaming laptop for a literature student whose current laptop runs perfectly.',
-      correct: 'wants',
-      explanationId: 'Keinginan (Wants). Laptop lama masih memadai untuk tugas kuliah. Ini dorongan upgrade gaya hidup/hobi gaming.',
-      explanationEn: 'Want. Current laptop functions well for literature studies. This is a lifestyle gaming upgrade.'
+      topic: 'Kebutuhan vs Keinginan',
+      topicEn: 'Needs vs Wants',
+      question: 'Manakah dari daftar pengeluaran berikut yang merupakan KEBUTUHAN POKOK (Needs) esensial yang wajib diprioritaskan?',
+      questionEn: 'Which of the following expenses represents a genuine ESSENTIAL NEED that must be prioritized?',
+      options: [
+        { id: 'opt_1', text: 'Upgrade smartphone model terbaru saat ponsel lama masih lancar', textEn: 'Upgrading to the newest smartphone while your current phone runs fine' },
+        { id: 'opt_2', text: 'Servis rem dan ganti ban motor harian untuk keselamatan berangkat kerja', textEn: 'Servicing brakes and replacing worn tires on a daily commuter vehicle' },
+        { id: 'opt_3', text: 'Langganan 4 platform video streaming sekaligus setiap bulan', textEn: 'Simultaneously subscribing to 4 video streaming platforms' },
+        { id: 'opt_4', text: 'Beli blind box hiasan meja saat checkout online shop', textEn: 'Adding trendy collectible blind boxes to your online shopping cart' }
+      ],
+      correctId: 'opt_2',
+      explanationId: 'Kebutuhan (Needs) adalah pengeluaran vital yang menyangkut keselamatan fisik, kesehatan, dan kelangsungan mencari nafkah harian.',
+      explanationEn: 'Needs are critical expenses directly tied to physical safety, basic health, and your ability to earn a livelihood.'
     },
     {
       id: 2,
-      item: 'Servis rem dan ganti ban motor harian yang sudah gundul untuk berangkat kerja.',
-      itemEn: 'Replacing worn-out motorcycle tires and brake pads used daily to commute to work.',
-      correct: 'needs',
-      explanationId: 'Kebutuhan (Needs). Terkait keselamatan nyawa dan mata pencaharian harian.',
-      explanationEn: 'Need. Essential for personal safety and earning daily livelihood.'
+      topic: 'Budgeting (Aturan 50 / 30 / 20)',
+      topicEn: 'Budgeting (50/30/20 Rule)',
+      question: 'Berdasarkan pedoman budgeting 50/30/20 yang sehat, berapa persentase maksimal penghasilan bulanan untuk pos Keinginan & Gaya Hidup (Wants)?',
+      questionEn: 'Under the healthy 50/30/20 budget framework, what is the maximum recommended allocation for Lifestyle & Wants?',
+      options: [
+        { id: 'opt_1', text: 'Maksimal 50% dari penghasilan bulanan', textEn: 'Up to 50% of monthly income' },
+        { id: 'opt_2', text: 'Maksimal 30% dari penghasilan bulanan', textEn: 'Maximum 30% of monthly income' },
+        { id: 'opt_3', text: 'Maksimal 10% saja', textEn: 'Only 10% maximum' },
+        { id: 'opt_4', text: 'Bebas selama uang di tabungan belum habis', textEn: 'As much as desired until the bank account empties' }
+      ],
+      correctId: 'opt_2',
+      explanationId: 'Aturan 50/30/20 menganjurkan maksimal 30% untuk gaya hidup/wishlist, 50% untuk kebutuhan pokok (needs), dan minimal 20% untuk tabungan/investasi serta cicilan produktif.',
+      explanationEn: 'The 50/30/20 rule designates a maximum of 30% for lifestyle wants, 50% for core living needs, and at least 20% for routine savings and debt management.'
     },
     {
       id: 3,
-      item: 'Paket langganan 4 platform streaming film sekaligus (Netflix, Disney+, Prime, Max).',
-      itemEn: 'Simultaneously subscribing to 4 movie streaming platforms.',
-      correct: 'wants',
-      explanationId: 'Keinginan (Wants). Cukup pilih 1 platform secara bergantian per bulan untuk menghemat ratusan ribu.',
-      explanationEn: 'Want. Rotating between one platform per month saves considerable money.'
+      topic: 'Impulsive Buying & Dopamine',
+      topicEn: 'Impulsive Buying & Dopamine Triggers',
+      question: 'Saat melihat promo flash sale dengan countdown timer "Sisa 5 Menit", langkah paling rasional untuk mengendalikan nafsu checkout adalah...',
+      questionEn: 'When confronted with a flash sale timer counting down "5 Minutes Left", what is the most mindful step to prevent impulse buying?',
+      options: [
+        { id: 'opt_1', text: 'Langsung klik bayar dengan PayLater agar diskon tidak hangus', textEn: 'Immediately checkout with PayLater before the timer expires' },
+        { id: 'opt_2', text: 'Terapkan Aturan Jeda 24 Jam (Cooling-off) dan tinggalkan keranjang belanja', textEn: 'Apply the 24-Hour Cooling-Off Rule and step away from the cart' },
+        { id: 'opt_3', text: 'Beli 2 barang sekaligus agar mendapat diskon bundling tambahan', textEn: 'Purchase 2 items to unlock an extra bundling discount' },
+        { id: 'opt_4', text: 'Tanyakan ke media sosial sambil menunggu diskon berikutnya', textEn: 'Ask on social media while hunting for more vouchers' }
+      ],
+      correctId: 'opt_2',
+      explanationId: 'Aturan Cooling-off 24–48 jam terbukti meredakan lonjakan dopamin sesaat akibat manipulasi marketing e-commerce. Setelah 24 jam, lebih dari 70% dorongan checkout akan mereda dengan sendirinya.',
+      explanationEn: 'The 24-48 hour cooling-off period allows emotional dopamine spikes to normalize. Over 70% of impulse buying urges disappear once the artificial urgency fades.'
     },
     {
       id: 4,
-      item: 'Kacamata resep baru karena lensa lama pecah dan minus bertambah.',
-      itemEn: 'Prescription eyeglasses after old lenses cracked and vision deteriorated.',
-      correct: 'needs',
-      explanationId: 'Kebutuhan (Needs). Alat bantu kesehatan medis wajib untuk beraktivitas normal.',
-      explanationEn: 'Need. Vital health aid necessary for everyday vision and work.'
+      topic: 'Dana Darurat (Emergency Runway)',
+      topicEn: 'Emergency Fund Runway',
+      question: 'Berapa besaran Dana Darurat ideal yang wajib disiapkan pekerja lajang sebelum mengalokasikan uang ke barang hobi bernilai besar?',
+      questionEn: 'What is the ideal emergency reserve a single professional should maintain before spending on high-ticket discretionary hobbies?',
+      options: [
+        { id: 'opt_1', text: 'Cukup 1 minggu uang jajan', textEn: 'Just 1 week of pocket cash' },
+        { id: 'opt_2', text: 'Minimal 3 hingga 6 bulan pengeluaran kebutuhan pokok', textEn: 'At least 3 to 6 months of basic living expenses' },
+        { id: 'opt_3', text: 'Tidak perlu simpan uang tunai, andalkan pinjaman online', textEn: 'No cash needed, rely on revolving digital loans' },
+        { id: 'opt_4', text: '12 tahun gaji tahunan', textEn: '12 years of full gross income' }
+      ],
+      correctId: 'opt_2',
+      explanationId: 'Dana darurat sebesar 3–6 bulan pengeluaran pokok adalah benteng perlindungan finansial jika terjadi PHK, sakit, atau darurat keluarga tanpa harus terjebak utang berbunga.',
+      explanationEn: 'A 3 to 6 month emergency fund provides a solid financial runway against unforeseen medical crises or job loss without having to resort to predatory debt.'
+    },
+    {
+      id: 5,
+      topic: 'PayLater & Risiko Utang (DSR)',
+      topicEn: 'PayLater & Debt Service Ratio (DSR)',
+      question: 'Berapa batas aman maksimal rasio total cicilan utang bulanan (Debt Service Ratio / DSR) terhadap penghasilan bersih agar tidak terancam gagal bayar?',
+      questionEn: 'What is the safe ceiling for your monthly Debt Service Ratio (DSR) relative to your take-home pay to prevent debt traps?',
+      options: [
+        { id: 'opt_1', text: 'Maksimal 30% dari pemasukan bulanan', textEn: 'Maximum 30% of net monthly income' },
+        { id: 'opt_2', text: 'Maksimal 75% dari pemasukan bulanan', textEn: 'Up to 75% of monthly income' },
+        { id: 'opt_3', text: 'Bebas selama limit aplikasi PayLater masih ada', textEn: 'Unlimited as long as digital credit limit remains' },
+        { id: 'opt_4', text: 'Maksimal 90% dari sisa saldo rekening', textEn: 'Up to 90% of available bank balance' }
+      ],
+      correctId: 'opt_1',
+      explanationId: 'Batas DSR maksimal yang sehat adalah 30%. Jika cicilan melebihi 30%, kamu rentan kehabisan kas operasional dan terpaksa menggunakan utang baru untuk membayar utang lama (gali lubang tutup lubang).',
+      explanationEn: 'A healthy DSR ceiling is 30%. Exceeding 30% severely constricts routine living cash flow and frequently spirals into dangerous revolving debt cycles.'
     }
   ];
+
+  const handleAnswerQuiz = (questionId: number, selectedOptionId: string) => {
+    if (answeredMap[questionId] !== undefined) return;
+    const q = quizQuestions.find(item => item.id === questionId);
+    if (!q) return;
+
+    const isCorrect = q.correctId === selectedOptionId;
+    if (isCorrect) {
+      setQuizScore(prev => prev + 1);
+    }
+    setAnsweredMap(prev => ({
+      ...prev,
+      [questionId]: { selectedId: selectedOptionId, isCorrect }
+    }));
+  };
 
   // Paylater interactive calculator
   const [calcPrice, setCalcPrice] = useState(1500000);
@@ -90,18 +153,6 @@ export const EducationDashboardView: React.FC<EducationDashboardViewProps> = ({
   const paylaterGrandTotal = calcPrice + paylaterTotalFee + paylaterAdminFee;
   const paylaterMonthlyPayment = Math.round(paylaterGrandTotal / calcTenor);
   const paylaterOverpayPercent = Number((((paylaterGrandTotal - calcPrice) / calcPrice) * 100).toFixed(1));
-
-  const handleAnswerQuiz = (questionId: number, answer: 'needs' | 'wants') => {
-    if (answeredMap[questionId] !== undefined) return;
-    const q = quizQuestions.find(item => item.id === questionId);
-    if (!q) return;
-
-    const isCorrect = q.correct === answer;
-    if (isCorrect) {
-      setQuizScore(prev => prev + 1);
-    }
-    setAnsweredMap(prev => ({ ...prev, [questionId]: isCorrect }));
-  };
 
   return (
     <div className="space-y-8 pb-16">
@@ -235,54 +286,76 @@ export const EducationDashboardView: React.FC<EducationDashboardViewProps> = ({
 
             <div className="space-y-4">
               {quizQuestions.map((q) => {
-                const isAnswered = answeredMap[q.id] !== undefined;
-                const wasCorrect = answeredMap[q.id] === true;
+                const answerState = answeredMap[q.id];
+                const isAnswered = answerState !== undefined;
+                const wasCorrect = answerState?.isCorrect;
 
                 return (
-                  <div key={q.id} className="p-4 rounded-2xl bg-white border border-[#E5ECF2] space-y-3">
-                    <p className="text-xs sm:text-sm font-semibold text-[#24303E] leading-relaxed">
-                      {language === 'id' ? q.item : q.itemEn}
-                    </p>
-
-                    <div className="flex flex-wrap items-center gap-2">
-                      <button
-                        onClick={() => handleAnswerQuiz(q.id, 'needs')}
-                        disabled={isAnswered}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
-                          isAnswered
-                            ? (q.correct === 'needs' ? 'bg-[#EAF0EB] text-[#47634F] border-[#9EAEA2]' : 'opacity-40 border-[#E2EAF0]')
-                            : 'bg-[#F8F6F2] hover:bg-[#EFECE6] border-[#DDE4EB] text-[#485C6E]'
-                        }`}
-                      >
-                        Kebutuhan (Needs)
-                      </button>
-
-                      <button
-                        onClick={() => handleAnswerQuiz(q.id, 'wants')}
-                        disabled={isAnswered}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
-                          isAnswered
-                            ? (q.correct === 'wants' ? 'bg-[#FBF1F5] text-[#8E4362] border-[#D8A4B8]' : 'opacity-40 border-[#E2EAF0]')
-                            : 'bg-[#F8F6F2] hover:bg-[#EFECE6] border-[#DDE4EB] text-[#485C6E]'
-                        }`}
-                      >
-                        Keinginan (Wants)
-                      </button>
-
+                  <div key={q.id} className="p-5 rounded-2xl bg-white border border-[#E5ECF2] shadow-xs space-y-3.5">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="px-2.5 py-0.5 rounded-full bg-[#E2EAF0] text-[#506A80] text-[10px] font-bold uppercase tracking-wider">
+                        {language === 'id' ? q.topic : q.topicEn}
+                      </span>
                       {isAnswered && (
-                        <span className={`text-xs font-bold flex items-center gap-1 ml-2 ${
-                          wasCorrect ? 'text-[#47634F]' : 'text-[#8E4362]'
+                        <span className={`text-xs font-bold flex items-center gap-1 ${
+                          wasCorrect ? 'text-[#059669]' : 'text-[#E11D48]'
                         }`}>
-                          {wasCorrect ? <CheckCircle2 className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
-                          {wasCorrect ? 'Tepat!' : 'Kurang Tepat'}
+                          {wasCorrect ? <CheckCircle2 className="w-4 h-4 text-[#059669]" /> : <XCircle className="w-4 h-4 text-[#E11D48]" />}
+                          <span>{wasCorrect ? (language === 'id' ? 'Benar!' : 'Correct!') : (language === 'id' ? 'Kurang Tepat' : 'Incorrect')}</span>
                         </span>
                       )}
                     </div>
 
+                    <p className="text-xs sm:text-sm font-bold text-[#24303E] leading-relaxed">
+                      {q.id}. {language === 'id' ? q.question : q.questionEn}
+                    </p>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                      {q.options.map((opt) => {
+                        const isSelected = answerState?.selectedId === opt.id;
+                        const isThisCorrect = opt.id === q.correctId;
+
+                        let btnStyle = 'bg-[#FBFBFA] border-[#DDE4EB] text-[#485C6E] hover:bg-[#F2F6F9]';
+                        if (isAnswered) {
+                          if (isThisCorrect) {
+                            btnStyle = 'bg-[#ECFDF5] border-[#10B981] text-[#065F46] font-bold ring-2 ring-[#10B981]/20';
+                          } else if (isSelected && !wasCorrect) {
+                            btnStyle = 'bg-[#FFF1F2] border-[#F43F5E] text-[#9F1239] font-bold';
+                          } else {
+                            btnStyle = 'opacity-40 border-[#E2EAF0] text-[#7A8C9E] bg-[#F8F6F2]';
+                          }
+                        } else if (isSelected) {
+                          btnStyle = 'bg-[#F9E8EE] border-[#D8A4B8] text-[#8E4362] font-bold ring-2 ring-[#D8A4B8]/30';
+                        }
+
+                        return (
+                          <button
+                            key={opt.id}
+                            type="button"
+                            onClick={() => handleAnswerQuiz(q.id, opt.id)}
+                            disabled={isAnswered}
+                            className={`p-3 rounded-xl text-xs text-left border transition-all flex items-start gap-2.5 cursor-pointer disabled:cursor-default ${btnStyle}`}
+                          >
+                            <span className="w-5 h-5 rounded-full bg-white/80 border border-current text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                              {opt.id.replace('opt_', '')}
+                            </span>
+                            <span className="leading-snug">
+                              {language === 'id' ? opt.text : opt.textEn}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+
                     {isAnswered && (
-                      <p className="text-[11px] text-[#55697A] bg-[#F8F6F2] p-2.5 rounded-xl border border-[#EAEFF4]">
-                        <strong>Penjelasan:</strong> {language === 'id' ? q.explanationId : q.explanationEn}
-                      </p>
+                      <div className="text-[11px] text-[#485C6E] bg-[#F8F6F2] p-3 rounded-xl border border-[#EAEFF4] space-y-1 animate-in fade-in">
+                        <strong className="text-[#24303E] block">
+                          💡 {language === 'id' ? 'Penjelasan Edukasi' : 'Educational Insight'}:
+                        </strong>
+                        <p className="leading-relaxed">
+                          {language === 'id' ? q.explanationId : q.explanationEn}
+                        </p>
+                      </div>
                     )}
                   </div>
                 );

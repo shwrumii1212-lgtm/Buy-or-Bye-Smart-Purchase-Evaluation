@@ -46,8 +46,27 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
   onNavigate,
 }) => {
   const t = translations[language];
+  const monthsList = [
+    { val: 'all' as const, labelId: 'Semua Bulan', labelEn: 'All Months' },
+    { val: 0, labelId: 'Januari', labelEn: 'January' },
+    { val: 1, labelId: 'Februari', labelEn: 'February' },
+    { val: 2, labelId: 'Maret', labelEn: 'March' },
+    { val: 3, labelId: 'April', labelEn: 'April' },
+    { val: 4, labelId: 'Mei', labelEn: 'May' },
+    { val: 5, labelId: 'Juni', labelEn: 'June' },
+    { val: 6, labelId: 'Juli', labelEn: 'July' },
+    { val: 7, labelId: 'Agustus', labelEn: 'August' },
+    { val: 8, labelId: 'September', labelEn: 'September' },
+    { val: 9, labelId: 'Oktober', labelEn: 'October' },
+    { val: 10, labelId: 'November', labelEn: 'November' },
+    { val: 11, labelId: 'Desember', labelEn: 'December' },
+  ];
+  const yearsList = [2024, 2025, 2026, 2027];
+
+  const currentDate = new Date();
+  const [selectedYear, setSelectedYear] = useState<number>(currentDate.getFullYear());
+  const [selectedMonth, setSelectedMonth] = useState<number | 'all'>('all');
   const [downloading, setDownloading] = useState(false);
-  const [selectedMonth, setSelectedMonth] = useState<string>('current');
   const [whatIfPercent, setWhatIfPercent] = useState<number>(15); // What-if simulation discount percent on lifestyle
   
   // Interactive action plan checkboxes state
@@ -62,22 +81,16 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
     setActionChecks(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
-  // Month calculation
-  const currentDate = new Date();
-  const currentMonthName = currentDate.toLocaleDateString(language === 'id' ? 'id-ID' : 'en-US', {
-    month: 'long',
-    year: 'numeric'
-  });
-
-  const prevDate = new Date();
-  prevDate.setMonth(prevDate.getMonth() - 1);
-  const prevMonthName = prevDate.toLocaleDateString(language === 'id' ? 'id-ID' : 'en-US', {
-    month: 'long',
-    year: 'numeric'
-  });
+  const selectedPeriodLabel = useMemo(() => {
+    if (selectedMonth === 'all') {
+      return `${language === 'id' ? 'Seluruh Bulan' : 'All Months'} ${selectedYear}`;
+    }
+    const m = monthsList.find(item => item.val === selectedMonth);
+    return `${language === 'id' ? m?.labelId : m?.labelEn} ${selectedYear}`;
+  }, [selectedMonth, selectedYear, language]);
 
   // Base financial figures
-  const income = finance.monthlyIncome || 1;
+  const income = finance.monthlyIncome || 0;
   const essentials = finance.essentialExpenses || 0;
   const lifestyle = finance.lifestyleExpenses || 0;
   const debts = finance.debtInstallments || 0;
@@ -91,31 +104,32 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
   const deficitAmount = isDeficit ? totalCommitted - income : 0;
 
   // Percentage shares of income
-  const essentialsPercent = Number(((essentials / income) * 100).toFixed(1));
-  const lifestylePercent = Number(((lifestyle / income) * 100).toFixed(1));
-  const debtsPercent = Number(((debts / income) * 100).toFixed(1));
-  const savingsPercent = Number(((savings / income) * 100).toFixed(1));
-  const freeCashPercent = Number(((discretionaryCash / income) * 100).toFixed(1));
+  const essentialsPercent = income > 0 ? Number(((essentials / income) * 100).toFixed(1)) : 0;
+  const lifestylePercent = income > 0 ? Number(((lifestyle / income) * 100).toFixed(1)) : 0;
+  const debtsPercent = income > 0 ? Number(((debts / income) * 100).toFixed(1)) : 0;
+  const savingsPercent = income > 0 ? Number(((savings / income) * 100).toFixed(1)) : 0;
+  const freeCashPercent = income > 0 ? Number(((discretionaryCash / income) * 100).toFixed(1)) : 0;
 
   // Debt Service Ratio (DSR)
   const dsr = debtsPercent;
 
   // Emergency runway
-  const monthlyEssentialBase = essentials > 0 ? essentials : income * 0.5;
-  const emergencyMonthsCurrent = Number((emergencyFund / monthlyEssentialBase).toFixed(1));
+  const monthlyEssentialBase = essentials > 0 ? essentials : (income > 0 ? income * 0.5 : 1);
+  const emergencyMonthsCurrent = essentials > 0 ? Number((emergencyFund / monthlyEssentialBase).toFixed(1)) : 0;
   const emergencyTargetAmount = monthlyEssentialBase * targetMonths;
-  const emergencyProgressPercent = Math.min(100, Math.round((emergencyFund / emergencyTargetAmount) * 100));
+  const emergencyProgressPercent = emergencyTargetAmount > 0 
+    ? Math.min(100, Math.round((emergencyFund / emergencyTargetAmount) * 100))
+    : 0;
 
-  // Filter shopping items based on selected month
+  // Filter shopping items strictly based on chosen year and month
   const filteredItems = useMemo(() => {
     return shoppingItems.filter(item => {
       const itemDate = new Date(item.date);
-      const isCurrentMonth = itemDate.getMonth() === currentDate.getMonth() && itemDate.getFullYear() === currentDate.getFullYear();
-      if (selectedMonth === 'current') return isCurrentMonth;
-      if (selectedMonth === 'previous') return !isCurrentMonth;
-      return true; // all
+      const yearMatch = itemDate.getFullYear() === selectedYear;
+      const monthMatch = selectedMonth === 'all' || itemDate.getMonth() === selectedMonth;
+      return yearMatch && monthMatch;
     });
-  }, [shoppingItems, selectedMonth, currentDate]);
+  }, [shoppingItems, selectedYear, selectedMonth]);
 
   // Shopping stats
   const totalBoughtItems = filteredItems.filter(i => i.status === 'bought');
@@ -228,39 +242,39 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
           </p>
         </div>
 
-        {/* Action Controls: Month selector & Download PDF */}
-        <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 self-start md:self-center">
-          <div className="flex items-center bg-[#F8F6F2] p-1 rounded-xl border border-[#E2EAF0]">
-            <button
-              onClick={() => setSelectedMonth('current')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                selectedMonth === 'current'
-                  ? 'bg-white text-[#24303E] shadow-xs'
-                  : 'text-[#6A7E90] hover:text-[#24303E]'
-              }`}
+        {/* Action Controls: Complete Month and Year selector & Download PDF */}
+        <div className="flex flex-wrap sm:flex-nowrap items-center gap-2.5 self-start md:self-center">
+          
+          {/* Year selector */}
+          <div className="flex items-center gap-1.5 bg-[#F8F6F2] px-2.5 py-1.5 rounded-xl border border-[#E2EAF0]">
+            <Calendar className="w-3.5 h-3.5 text-[#6B8BA4]" />
+            <select
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(Number(e.target.value))}
+              className="bg-transparent text-xs font-bold text-[#24303E] outline-none cursor-pointer"
             >
-              {language === 'id' ? 'Bulan Ini' : 'Current Month'}
-            </button>
-            <button
-              onClick={() => setSelectedMonth('previous')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                selectedMonth === 'previous'
-                  ? 'bg-white text-[#24303E] shadow-xs'
-                  : 'text-[#6A7E90] hover:text-[#24303E]'
-              }`}
+              {yearsList.map(y => (
+                <option key={y} value={y}>{y}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Month selector */}
+          <div className="bg-[#F8F6F2] px-2.5 py-1.5 rounded-xl border border-[#E2EAF0]">
+            <select
+              value={selectedMonth}
+              onChange={(e) => {
+                const val = e.target.value;
+                setSelectedMonth(val === 'all' ? 'all' : Number(val));
+              }}
+              className="bg-transparent text-xs font-semibold text-[#24303E] outline-none cursor-pointer"
             >
-              {language === 'id' ? 'Bulan Lalu' : 'Previous Month'}
-            </button>
-            <button
-              onClick={() => setSelectedMonth('all')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                selectedMonth === 'all'
-                  ? 'bg-white text-[#24303E] shadow-xs'
-                  : 'text-[#6A7E90] hover:text-[#24303E]'
-              }`}
-            >
-              {language === 'id' ? 'Semua' : 'All Data'}
-            </button>
+              {monthsList.map(m => (
+                <option key={String(m.val)} value={m.val}>
+                  {language === 'id' ? m.labelId : m.labelEn}
+                </option>
+              ))}
+            </select>
           </div>
 
           <button
@@ -301,7 +315,7 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
         <div className="p-5 rounded-2xl bg-white border border-[#E2EAF0] shadow-xs space-y-2">
           <div className="flex items-center justify-between text-[#8CA8BF]">
             <span className="text-xs font-semibold text-[#5C6F80]">
-              {language === 'id' ? 'Total Komitmen' : 'Committed Total'}
+              {language === 'id' ? 'Total Pengeluaran' : 'Total Expenses'}
             </span>
             <Layers className="w-4 h-4" />
           </div>
@@ -409,8 +423,8 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
             </div>
             <h3 className="font-heading font-bold text-lg text-[#24303E] mt-1">
               {language === 'id' 
-                ? `Kondisi Arus Kas Bulan ${selectedMonth === 'previous' ? prevMonthName : currentMonthName}`
-                : `Cash Flow State for ${selectedMonth === 'previous' ? prevMonthName : currentMonthName}`}
+                ? `Kondisi Arus Kas Periode ${selectedPeriodLabel}`
+                : `Cash Flow State for ${selectedPeriodLabel}`}
             </h3>
             <p className="text-xs text-[#5C6F80] max-w-xl">
               {healthScore >= 80 
@@ -849,32 +863,32 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
               {language === 'id' ? 'Rasio Keputusan Evaluasi Belanja' : 'Evaluation Decision Distribution'}
             </span>
             <div className="grid grid-cols-3 gap-3 text-center">
-              <div className="p-3 rounded-xl bg-[#9EAEA2]/15 border border-[#9EAEA2]/30">
-                <span className="text-xs font-bold text-[#396348] block">BUY</span>
-                <span className="font-heading font-extrabold text-lg text-[#24303E]">
+              <div className="p-3 rounded-xl bg-[#ECFDF5] border border-[#10B981]">
+                <span className="text-xs font-bold text-[#065F46] block">BUY</span>
+                <span className="font-heading font-extrabold text-lg text-[#065F46]">
                   {totalBoughtItems.length}
                 </span>
-                <span className="text-[10px] text-[#5C6F80] block">
+                <span className="text-[10px] text-[#047857] block font-medium">
                   {language === 'id' ? 'Layak Dibeli' : 'Approved'}
                 </span>
               </div>
 
-              <div className="p-3 rounded-xl bg-[#D8A4B8]/15 border border-[#D8A4B8]/30">
-                <span className="text-xs font-bold text-[#8A3A5A] block">BYE</span>
-                <span className="font-heading font-extrabold text-lg text-[#24303E]">
+              <div className="p-3 rounded-xl bg-[#FFF1F2] border border-[#F43F5E]">
+                <span className="text-xs font-bold text-[#9F1239] block">BYE</span>
+                <span className="font-heading font-extrabold text-lg text-[#9F1239]">
                   {totalByeItems.length}
                 </span>
-                <span className="text-[10px] text-[#5C6F80] block">
-                  {language === 'id' ? 'Ditolak/Hemat' : 'Skipped/Saved'}
+                <span className="text-[10px] text-[#BE123C] block font-medium">
+                  {language === 'id' ? 'Ditolak / Hemat' : 'Skipped / Saved'}
                 </span>
               </div>
 
-              <div className="p-3 rounded-xl bg-[#9B8EA9]/15 border border-[#9B8EA9]/30">
-                <span className="text-xs font-bold text-[#5F4E73] block">COOLING</span>
-                <span className="font-heading font-extrabold text-lg text-[#24303E]">
+              <div className="p-3 rounded-xl bg-[#EEF2FF] border border-[#818CF8]">
+                <span className="text-xs font-bold text-[#3730A3] block">COOLING</span>
+                <span className="font-heading font-extrabold text-lg text-[#3730A3]">
                   {totalCoolingItems.length}
                 </span>
-                <span className="text-[10px] text-[#5C6F80] block">
+                <span className="text-[10px] text-[#4F46E5] block font-medium">
                   {language === 'id' ? 'Tahan 24-48 Jam' : 'Paused 24-48h'}
                 </span>
               </div>

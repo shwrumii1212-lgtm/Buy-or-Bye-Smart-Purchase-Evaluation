@@ -54,8 +54,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
           <h1 className="font-heading text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[#24303E] leading-[1.15]">
             {t.heroTitle}
-            <span className="block mt-1 bg-gradient-to-r from-[#6B8BA4] via-[#9B8EA9] to-[#D8A4B8] bg-clip-text text-transparent">
-              {t.heroTitleHighlight}
+            <span className="block mt-1">
+              <span className="text-[#16A34A]">Buy</span> <span className="text-black font-semibold">or</span> <span className="text-[#EC4899]">Bye?</span>
             </span>
           </h1>
 
@@ -63,23 +63,54 @@ export const HomeView: React.FC<HomeViewProps> = ({
             {t.heroSubtitle}
           </p>
 
-          {/* Action CTAs */}
-          <div className="mt-8 flex flex-wrap items-center gap-3.5">
-            <button
-              onClick={() => onNavigate('evaluate')}
-              className="flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-[#6B8BA4] hover:bg-[#587893] text-white font-semibold text-sm transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
-            >
-              <ShoppingBag className="w-4 h-4" />
-              <span>{t.heroCtaEvaluate}</span>
-              <ArrowRight className="w-4 h-4 ml-1" />
-            </button>
+          {/* Notice to setup financial profile first if not set */}
+          {(!finance || finance.monthlyIncome <= 0) && (
+            <div className="mt-6 p-4 rounded-2xl bg-white/90 border border-[#DCE4EC] shadow-xs flex items-start gap-3 backdrop-blur-xs">
+              <div className="w-8 h-8 rounded-xl bg-[#E2EAF0] text-[#6B8BA4] flex items-center justify-center shrink-0 mt-0.5">
+                <Wallet className="w-4 h-4" />
+              </div>
+              <div className="text-xs space-y-1">
+                <p className="font-bold text-[#24303E]">
+                  {language === 'id' ? 'Langkah 1 Wajib: Atur Profil Keuangan Dahulu' : 'Step 1 Required: Set Up Financial Profile First'}
+                </p>
+                <p className="text-[#55697A] leading-relaxed">
+                  {language === 'id' 
+                    ? 'Mesin evaluasi kami membutuhkan data pemasukan & pengeluaranmu. Jika belum diisi, sisa uang bebas terdeteksi Rp 0 sehingga barang sewajar apapun otomatis akan dinilai "BYE".'
+                    : 'Our evaluation engine requires your income & expense foundation. Without this, your free cash is detected as $0 and every item automatically scores as "BYE".'}
+                </p>
+              </div>
+            </div>
+          )}
 
+          {/* Action CTAs: Highlighting Atur Profil Keuangan first */}
+          <div className="mt-7 flex flex-wrap items-center gap-3.5">
+            {/* Primary Highlighted Button: Atur Profil Keuangan */}
             <button
               onClick={() => onNavigate('finance')}
-              className="flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-white hover:bg-[#F8F6F2] text-[#334657] border border-[#CBD7E2] font-semibold text-sm transition-all shadow-xs hover:border-[#6B8BA4] cursor-pointer"
+              className="flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-[#6B8BA4] hover:bg-[#587893] text-white font-heading font-extrabold text-sm transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 cursor-pointer ring-2 ring-[#6B8BA4]/30"
             >
-              <Wallet className="w-4 h-4 text-[#6B8BA4]" />
+              <Wallet className="w-4 h-4" />
               <span>{t.heroCtaFinance}</span>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/20 text-white ml-0.5">
+                {language === 'id' ? 'Langkah 1' : 'Step 1'}
+              </span>
+              <ArrowRight className="w-4 h-4 ml-0.5" />
+            </button>
+
+            {/* Secondary Button: Mulai Evaluasi Barang */}
+            <button
+              onClick={() => onNavigate('evaluate')}
+              className={`flex items-center gap-2.5 px-6 py-3.5 rounded-2xl border font-semibold text-sm transition-all shadow-xs cursor-pointer ${
+                finance && finance.monthlyIncome > 0
+                  ? 'bg-white hover:bg-[#F8F6F2] text-[#24303E] border-[#CBD7E2] hover:border-[#6B8BA4]'
+                  : 'bg-white/70 hover:bg-white text-[#506272] border-[#D5DFE7]'
+              }`}
+            >
+              <ShoppingBag className="w-4 h-4 text-[#6B8BA4]" />
+              <span>{t.heroCtaEvaluate}</span>
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#E2EAF0] text-[#527189] ml-0.5">
+                {language === 'id' ? 'Langkah 2' : 'Step 2'}
+              </span>
             </button>
 
             <button
@@ -95,68 +126,36 @@ export const HomeView: React.FC<HomeViewProps> = ({
           {finance && (
             <div className="mt-8 pt-6 border-t border-[#D5DFE7]/70 flex flex-wrap items-center gap-4 sm:gap-8 text-xs text-[#506272]">
               <div>
-                <span className="text-[11px] text-[#7A8C9E] block">Pemasukan Bulanan</span>
+                <span className="text-[11px] text-[#7A8C9E] block">
+                  {language === 'id' ? 'Pemasukan Bulanan' : 'Monthly Income'}
+                </span>
                 <span className="font-bold text-[#24303E] text-sm">
-                  Rp {finance.monthlyIncome.toLocaleString('id-ID')}
+                  {finance.monthlyIncome > 0 ? `Rp ${finance.monthlyIncome.toLocaleString('id-ID')}` : '-'}
                 </span>
               </div>
               <div className="hidden sm:block w-px h-7 bg-[#D5DFE7]" />
               <div>
-                <span className="text-[11px] text-[#7A8C9E] block">Dana Darurat Terkumpul</span>
+                <span className="text-[11px] text-[#7A8C9E] block">
+                  {language === 'id' ? 'Dana Darurat Terkumpul' : 'Emergency Fund'}
+                </span>
                 <span className="font-bold text-[#47634F] text-sm">
-                  Rp {finance.emergencyFund.toLocaleString('id-ID')}
+                  {finance.emergencyFund > 0 ? `Rp ${finance.emergencyFund.toLocaleString('id-ID')}` : '-'}
                 </span>
               </div>
               <div className="hidden sm:block w-px h-7 bg-[#D5DFE7]" />
               <div>
-                <span className="text-[11px] text-[#7A8C9E] block">Sisa Uang Bebas</span>
+                <span className="text-[11px] text-[#7A8C9E] block">
+                  {language === 'id' ? 'Sisa Uang Bebas' : 'Free Cash'}
+                </span>
                 <span className="font-bold text-[#6B8BA4] text-sm">
-                  Rp {Math.max(0, finance.monthlyIncome - (finance.essentialExpenses + finance.lifestyleExpenses + finance.debtInstallments + finance.savings)).toLocaleString('id-ID')}
+                  {finance.monthlyIncome > 0 
+                    ? `Rp ${Math.max(0, finance.monthlyIncome - (finance.essentialExpenses + finance.lifestyleExpenses + finance.debtInstallments + finance.savings)).toLocaleString('id-ID')}` 
+                    : '-'}
                 </span>
               </div>
             </div>
           )}
         </div>
-      </section>
-
-      {/* Live Counter & Metrics Bar */}
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        
-        <div className="p-6 rounded-2xl bg-white border border-[#E2EAF0] shadow-xs flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-[#EAF0EB] text-[#7E9383] flex items-center justify-center shrink-0">
-            <ShieldCheck className="w-6 h-6" />
-          </div>
-          <div>
-            <p className="text-xs uppercase font-bold tracking-wider text-[#7A8C9E]">{t.quickStatsSaved}</p>
-            <p className="text-2xl font-heading font-extrabold text-[#24303E] mt-0.5">
-              Rp {savedMoneyTotal > 0 ? savedMoneyTotal.toLocaleString('id-ID') : '1.230.000'}
-            </p>
-            <p className="text-[11px] text-[#7E9383] font-medium mt-0.5">Terlindungi dari keputusan impulsif</p>
-          </div>
-        </div>
-
-        <div className="p-6 rounded-2xl bg-white border border-[#E2EAF0] shadow-xs flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-[#E2EAF0] text-[#6B8BA4] flex items-center justify-center shrink-0">
-            <Scale className="w-6 h-6" />
-          </div>
-          <div>
-            <p className="text-xs uppercase font-bold tracking-wider text-[#7A8C9E]">{t.quickStatsDecisions}</p>
-            <p className="text-2xl font-heading font-extrabold text-[#24303E] mt-0.5">100% Rule-Based</p>
-            <p className="text-[11px] text-[#6B8BA4] font-medium mt-0.5">Tanpa tebakan acak, murni kalkulasi objektif</p>
-          </div>
-        </div>
-
-        <div className="p-6 rounded-2xl bg-white border border-[#E2EAF0] shadow-xs flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-[#F5EBEF] text-[#D8A4B8] flex items-center justify-center shrink-0">
-            <Clock className="w-6 h-6" />
-          </div>
-          <div>
-            <p className="text-xs uppercase font-bold tracking-wider text-[#7A8C9E]">Dopamine Delay</p>
-            <p className="text-2xl font-heading font-extrabold text-[#24303E] mt-0.5">24 - 48 Jam</p>
-            <p className="text-[11px] text-[#C487A0] font-medium mt-0.5">Metode efektif redam nafsu checkout promo</p>
-          </div>
-        </div>
-
       </section>
 
       {/* 3 Step Process */}
@@ -244,20 +243,32 @@ export const HomeView: React.FC<HomeViewProps> = ({
       {/* Impulse Sanity Banner */}
       <section className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-[#6B8BA4] to-[#8CA8BF] text-white flex flex-col sm:flex-row items-center justify-between gap-6 shadow-md">
         <div className="space-y-1">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-white/80">Belanja Bukan Pelarian Emosi</span>
+          <span className="text-[11px] font-bold uppercase tracking-wider text-white/80">
+            {language === 'id' ? 'Belanja Bukan Pelarian Emosi' : 'Mindful Decision Gatekeeper'}
+          </span>
           <h3 className="font-heading text-xl sm:text-2xl font-bold">
-            Punya Keranjang Belanja yang Menunggu di-Checkout?
+            {language === 'id' ? 'Punya Keranjang Belanja yang Menunggu di-Checkout?' : 'Have an Item Waiting in Your Shopping Cart?'}
           </h3>
           <p className="text-xs sm:text-sm text-white/85 max-w-xl">
-            Luangkan 60 detik untuk menguji kelayakannya sekarang sebelum uangmu keluar sia-sia.
+            {language === 'id' 
+              ? 'Luangkan 60 detik untuk menguji kelayakannya sekarang sebelum uangmu keluar sia-sia.' 
+              : 'Take 60 seconds to evaluate its impact objectively before parting with your hard-earned funds.'}
           </p>
         </div>
-        <button
-          onClick={() => onNavigate('evaluate')}
-          className="shrink-0 px-6 py-3 rounded-xl bg-white text-[#24303E] font-bold text-xs hover:bg-[#F8F6F2] transition-colors shadow-sm cursor-pointer"
-        >
-          Tes Kelayakan Sekarang →
-        </button>
+        <div className="flex items-center gap-2.5 shrink-0">
+          <button
+            onClick={() => onNavigate('finance')}
+            className="px-5 py-3 rounded-xl bg-white text-[#24303E] font-bold text-xs hover:bg-[#F8F6F2] transition-colors shadow-sm cursor-pointer"
+          >
+            {language === 'id' ? 'Atur Profil Keuangan' : 'Set Up Finances'}
+          </button>
+          <button
+            onClick={() => onNavigate('evaluate')}
+            className="px-5 py-3 rounded-xl bg-white/20 hover:bg-white/30 text-white border border-white/40 font-bold text-xs transition-colors cursor-pointer"
+          >
+            {language === 'id' ? 'Tes Barang →' : 'Evaluate Item →'}
+          </button>
+        </div>
       </section>
 
     </div>

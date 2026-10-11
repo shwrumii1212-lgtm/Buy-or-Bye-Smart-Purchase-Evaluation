@@ -17,7 +17,8 @@ import {
   Check,
   Download,
   FileText,
-  BarChart3
+  BarChart3,
+  Layers
 } from 'lucide-react';
 import { FinancialProfile, Language, ShoppingLogItem } from '../types';
 import { translations } from '../utils/translations';
@@ -58,7 +59,9 @@ export const FinancialDashboardView: React.FC<FinancialDashboardViewProps> = ({
 
   // Calculated live metrics based on current inline inputs
   const currentIncome = inlineIncome || 1;
-  const committedTotal = inlineEssentials + inlineLifestyle + inlineDebts + inlineSavings;
+  // Total Pengeluaran Bulanan (pokok + wishlist + cicilan + tabungan rutin/kewajiban lain)
+  const totalMonthlyExpenses = inlineEssentials + inlineLifestyle + inlineDebts + inlineSavings;
+  const committedTotal = totalMonthlyExpenses;
   const discretionaryCash = Math.max(0, currentIncome - committedTotal);
   const dsr = Number(((inlineDebts / currentIncome) * 100).toFixed(1));
   
@@ -181,32 +184,28 @@ export const FinancialDashboardView: React.FC<FinancialDashboardViewProps> = ({
             <Download className="w-4 h-4 text-[#6B8BA4]" />
             <span>{downloadingMonthly ? 'Mencetak PDF...' : (language === 'id' ? 'Unduh Laporan Bulanan (PDF)' : 'Download Monthly Report (PDF)')}</span>
           </button>
-
-          <button
-            onClick={() => setModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#D5DFE7] bg-white hover:bg-[#F8F6F2] text-[#334657] text-xs font-semibold shadow-xs transition-all cursor-pointer"
-          >
-            <Edit3 className="w-3.5 h-3.5 text-[#6B8BA4]" />
-            <span>Buka Dialog</span>
-          </button>
         </div>
       </div>
 
-      {/* 4 Core Summary Stat Cards */}
+      {/* 4 Core Live Financial Health Overview Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
-        {/* Income Card */}
+        {/* Total Pengeluaran Bulanan */}
         <div className="p-5 rounded-2xl bg-white border border-[#E2EAF0] shadow-xs">
           <div className="flex items-center justify-between text-[#6B8BA4] mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#7A8C9E]">Penghasilan Bulanan</span>
-            <div className="w-8 h-8 rounded-lg bg-[#E2EAF0] flex items-center justify-center">
-              <Wallet className="w-4 h-4 text-[#6B8BA4]" />
+            <span className="text-xs font-bold uppercase tracking-wider text-[#7A8C9E]">
+              {language === 'id' ? 'Total Pengeluaran Bulanan' : 'Total Monthly Expenses'}
+            </span>
+            <div className="w-8 h-8 rounded-lg bg-[#F0F5F8] flex items-center justify-center">
+              <Layers className="w-4 h-4 text-[#6B8BA4]" />
             </div>
           </div>
           <p className="text-2xl font-heading font-black text-[#24303E]">
-            Rp {inlineIncome.toLocaleString('id-ID')}
+            Rp {totalMonthlyExpenses.toLocaleString('id-ID')}
           </p>
-          <p className="text-[11px] text-[#7A8C9E] mt-1">Take Home Pay bersih per bulan</p>
+          <p className="text-[11px] text-[#5C6F80] font-medium mt-1">
+            {currentIncome > 0 ? `${Math.round((totalMonthlyExpenses / currentIncome) * 100)}% dari pemasukan` : 'Pokok + Lifestyle + Cicilan + Tabungan'}
+          </p>
         </div>
 
         {/* Discretionary Free Cash */}
@@ -221,7 +220,7 @@ export const FinancialDashboardView: React.FC<FinancialDashboardViewProps> = ({
             Rp {discretionaryCash.toLocaleString('id-ID')}
           </p>
           <p className="text-[11px] text-[#7E9383] font-medium mt-1">
-            Uang bebas untuk evaluasi belanja
+            {language === 'id' ? 'Sisa kas bebas untuk evaluasi belanja' : 'Free cash available for shopping'}
           </p>
         </div>
 
@@ -234,10 +233,10 @@ export const FinancialDashboardView: React.FC<FinancialDashboardViewProps> = ({
             </div>
           </div>
           <p className="text-2xl font-heading font-black text-[#24303E]">
-            {dsr}%
+            {inlineIncome > 0 ? `${dsr}%` : '0%'}
           </p>
           <p className="text-[11px] text-[#7A8C9E] mt-1">
-            {dsr <= 30 ? 'Aman (Maks 30%) ✓' : 'Peringatan: Melebihi 30% ⚠️'}
+            {inlineIncome > 0 ? (dsr <= 30 ? 'Aman (Maks 30%) ✓' : 'Peringatan: Melebihi 30% ⚠️') : 'Isi pemasukan di bawah'}
           </p>
         </div>
 
@@ -250,10 +249,10 @@ export const FinancialDashboardView: React.FC<FinancialDashboardViewProps> = ({
             </div>
           </div>
           <p className="text-2xl font-heading font-black text-[#24303E]">
-            {emergencyMonthsCurrent} <span className="text-sm font-normal text-[#7A8C9E]">Bulan</span>
+            {inlineEssentials > 0 ? emergencyMonthsCurrent : 0} <span className="text-sm font-normal text-[#7A8C9E]">Bulan</span>
           </p>
           <p className="text-[11px] text-[#9B8EA9] font-medium mt-1">
-            Target aman: {inlineTargetMonths} bulan pengeluaran
+            Target: {inlineTargetMonths} bulan pengeluaran
           </p>
         </div>
 
@@ -290,7 +289,7 @@ export const FinancialDashboardView: React.FC<FinancialDashboardViewProps> = ({
           <div className="p-4 rounded-2xl bg-[#F8F6F2] border border-[#E5ECF2]">
             <div className="flex items-center justify-between mb-1.5">
               <label className="text-xs font-bold text-[#24303E]">
-                {t.monthlyIncome} (Take Home Pay) *
+                {t.monthlyIncome} *
               </label>
               <span className="text-xs font-extrabold text-[#6B8BA4]">
                 Rp {inlineIncome.toLocaleString('id-ID')}
