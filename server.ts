@@ -55,23 +55,30 @@ let discussions: Discussion[] = [
     title: 'Gaji UMR mau mulai budgeting 50/30/20 tapi biaya kos mahal, gimana solusinya?',
     category: 'budgeting',
     authorName: 'Dina K.',
-    authorRole: 'Member',
-    content: 'Halo teman-teman Buy or Bye! Penghasilan saya sekitar Rp 4,5 juta/bulan. Sekarang kosan + listrik habis Rp 1,6 juta sendiri (lebih dari 35%). Mau terapkan 50/30/20 susah banget di pos kebutuhan pokok (50%). Adakah yang punya formula alternatif budgeting yang lebih realistis untuk perantau kota besar?',
+    authorRole: 'Community Member',
+    content: 'Halo teman-teman Buy or Bye! Penghasilan saya sekitar Rp 4,5 juta/bulan di kota besar. Sekarang biaya kosan + listrik habis Rp 1,6 juta sendiri (hampir 36%). Mau terapkan 50/30/20 susah banget di pos kebutuhan pokok (50%). Adakah yang punya formula alternatif budgeting yang lebih realistis untuk perantau?',
     createdAt: new Date(Date.now() - 36 * 3600 * 1000).toISOString(),
     replies: [
       {
         id: 'rep-1-1',
         authorName: 'Rian Pratama',
         authorRole: 'Budgeting Enthusiast',
-        content: 'Halo Dina! Rumus 50/30/20 dari Elizabeth Warren memang ideal untuk negara maju dengan biaya hidup proporsional. Buat perantau Indonesia, kamu bisa coba formula 65/20/15 atau 60/25/15: 60-65% kebutuhan pokok (termasuk kos & makan), 15-20% tabungan & dana darurat (wajib diawalkan saat gajian), dan 15-20% gaya hidup / self-reward terkontrol. Yang terpenting bukan persentase kaku, tapi konsistensi menabungnya!',
+        content: 'Halo Dina! Rumus 50/30/20 dari Elizabeth Warren memang aslinya dirancang untuk kondisi biaya hidup seimbang. Buat perantau kota besar, kamu bisa pakai formula adaptif 60/20/20 atau 65/20/15:\n- 60-65% Kebutuhan Pokok (kos, makan sehat hemat, transport kerja)\n- 20% Tabungan & Dana Darurat (langsung potong di hari gajian)\n- 15-20% Gaya Hidup & Self-Reward terukur.\n\nKuncinya: jangan korbankan tabungan demi nongkrong, tapi jangan menyiksa diri juga!',
         createdAt: new Date(Date.now() - 30 * 3600 * 1000).toISOString(),
       },
       {
         id: 'rep-1-2',
         authorName: 'Siti Rahma',
-        authorRole: 'Member',
-        content: 'Setuju sama Kak Rian. Waktu awal kerja aku juga kos sendirian mahal. Akhirnya tahun kedua cari room-mate untuk sewa kamar berdua, biaya kos langsung kepotong 40%! Kalau memungkinkan itu sangat membantu tabungan pos primer.',
+        authorRole: 'Community Member',
+        content: 'Setuju banget sama Kak Rian. Dulu kos sendirian bikin boncos, tahun kedua aku ajak teman sekantor buat sewa kamar berdua (twin bed). Biaya kos langsung kepotong 40%! Kalau lingkungan kosmu memungkinkan, opsi sharing room sangat membantu menyelamatkan cashflow.',
         createdAt: new Date(Date.now() - 18 * 3600 * 1000).toISOString(),
+      },
+      {
+        id: 'rep-1-3',
+        authorName: 'Ardi Wijaya',
+        authorRole: 'Member',
+        content: 'Bisa juga coba meal prep masak nasi dan lauk simpel di kos untuk sarapan/malam. Pengeluaran makan di luar yang biasanya 1,5 juta bisa ditekan jadi 800 ribu sebulan.',
+        createdAt: new Date(Date.now() - 6 * 3600 * 1000).toISOString(),
       }
     ]
   },
@@ -87,34 +94,48 @@ let discussions: Discussion[] = [
       {
         id: 'rep-2-1',
         authorName: 'Amanda Putri',
-        authorRole: 'Member',
-        content: 'Keren banget Kak Kevin! Boleh sharing urutan langkah Snowball Debt-nya? Aku lagi ada 2 tagihan paylater kecil dan 1 pinjaman gadget yang lumayan gede.',
+        authorRole: 'Community Member',
+        content: 'Keren banget Kak Kevin! Boleh sharing urutan langkah Snowball Debt-nya? Aku lagi ada 2 tagihan paylater kecil dan 1 pinjaman gadget yang lumayan bikin pusing.',
         createdAt: new Date(Date.now() - 60 * 3600 * 1000).toISOString(),
       },
       {
         id: 'rep-2-2',
         authorName: 'Kevin Wardhana',
         authorRole: 'Financial Survivor',
-        content: 'Hai Amanda! Kuncinya: urutkan dari nominal pokok terkecil tanpa peduli suku bunga. Bayar minimum untuk semuanya, tapi alokasikan semua sisa uang ekstra untuk tagihan terkecil sampai LUNAS. Kemenangan psikologis saat satu akun lunas bikin kita punya motivasi ekstra buat babat tagihan berikutnya!',
+        content: 'Hai Amanda! Urutkan utang dari saldo nominal pokok paling KECIL sampai paling BESAR, tanpa lihat bunganya dulu. Bayar batas minimum untuk semua akun, tapi semua sisa uang bebas bulanan difokuskan babat habis akun terkecil pertama. Begitu 1 akun lunas, lega luar biasa dan ada suntikan moral buat lanjut babat akun berikutnya!',
         createdAt: new Date(Date.now() - 48 * 3600 * 1000).toISOString(),
+      },
+      {
+        id: 'rep-2-3',
+        authorName: 'Rifki H.',
+        authorRole: 'Member',
+        content: 'Jangan lupa hapus semua data pembayaran instan & uninstall aplikasinya sementara waktu biar gak tergiur buka lagi ya Kak.',
+        createdAt: new Date(Date.now() - 20 * 3600 * 1000).toISOString(),
       }
     ]
   },
   {
     id: 'disc-3',
-    title: 'Trik ampuh menahan "Checkout Tengah Malam" pas lagi doom scrolling',
+    title: 'Trik ampuh menahan "Checkout Tengah Malam" pas lagi doom scrolling diskon',
     category: 'belanja_impulsif',
     authorName: 'Nadia S.',
-    authorRole: 'Member',
-    content: 'Tiap jam 11 malam ke atas rasanya jari gatal pengen buka marketplace. Algoritma rekomendasi racun banget. Ada tips konkrit selain hapus aplikasi? Soalnya aplikasi marketplace kadang masih dipakai beli deterjen dan sabun bulanan.',
+    authorRole: 'Community Member',
+    content: 'Tiap jam 11 malam ke atas rasanya jari gatal pengen buka marketplace. Algoritma rekomendasi racun banget dan sering berakhir checkout barang gak penting. Ada tips konkrit selain hapus aplikasi? Soalnya aplikasi marketplace kadang masih dipakai belanja kebutuhan rumah tangga.',
     createdAt: new Date(Date.now() - 12 * 3600 * 1000).toISOString(),
     replies: [
       {
         id: 'rep-3-1',
         authorName: 'Fajar Nugraha',
         authorRole: 'Mindful Spender',
-        content: 'Trik terbaik: hapus fitur One-Click Checkout dan unlink kartu kredit/debit instan dari aplikasi. Setiap mau bayar, paksa dirimu bayar via transfer manual atau virtual account yang butuh buka m-banking dan ketik password. Hambatan (friction) 2 menit ini 90% efektif bikin otak sadar dan batal beli barang gak penting!',
+        content: 'Trik terbaik: hapus fitur One-Click Checkout dan unlink kartu kredit/debit instan dari aplikasi. Setiap mau bayar, paksa dirimu bayar via transfer manual atau virtual account yang butuh buka m-banking dan ketik password. Hambatan (friction) 2 menit ini 90% efektif bikin otak sadar dan membatalkan checkout!',
         createdAt: new Date(Date.now() - 8 * 3600 * 1000).toISOString(),
+      },
+      {
+        id: 'rep-3-2',
+        authorName: 'Vania L.',
+        authorRole: 'Community Member',
+        content: 'Aku terapkan aturan: kalau lihat barang pengen, masukin wishlist lalu WAJIB diuji di Buy or Bye dan tunggu minimal 48 jam. Kalau setelah 2 hari masih kepikiran dan rasional, baru boleh dipikirkan lagi.',
+        createdAt: new Date(Date.now() - 3 * 3600 * 1000).toISOString(),
       }
     ]
   },
@@ -123,16 +144,73 @@ let discussions: Discussion[] = [
     title: 'Berapa idealnya dana darurat sebelum mulai beli instrumen investasi?',
     category: 'menabung',
     authorName: 'Bima Satria',
-    authorRole: 'Member',
-    content: 'Banyak teman seumuran langsung beli saham/kripto padahal rekening tabungan mepet. Sebenarnya kapan saat yang tepat dan aman buat mulai investasi bagi pemula yang baru punya gaji pertama?',
+    authorRole: 'Community Member',
+    content: 'Banyak teman seumuran langsung fomo beli saham atau kripto padahal rekening tabungan tipis. Sebenarnya kapan saat yang tepat dan aman buat mulai investasi bagi pemula yang baru bekerja?',
     createdAt: new Date(Date.now() - 120 * 3600 * 1000).toISOString(),
     replies: [
       {
         id: 'rep-4-1',
         authorName: 'Buy or Bye Mentor',
-        authorRole: 'Educator',
-        content: 'Hai Bima! Fondasi piramida finansial adalah Dana Darurat minimal 3 bulan pengeluaran pokok (untuk lajang) atau 6 bulan (jika sudah berkeluarga/freelancer). Dana darurat harus di instrumen likuid bebas risiko pasar (deposito, tabungan terpisah, atau RDPU). Setelah dana darurat terkunci dan tidak ada utang konsumtif berbunga tinggi, baru kamu bisa mulai alokasikan uang dingin untuk investasi.',
+        authorRole: 'Financial Educator',
+        content: 'Hai Bima! Fondasi piramida finansial adalah Dana Darurat minimal 3 bulan biaya hidup pokok (untuk lajang) atau 6 bulan (jika sudah berkeluarga / freelancer). Dana darurat harus disimpan di instrumen likuid bebas fluktuasi pasar modal (seperti Reksa Dana Pasar Uang atau tabungan terpisah). Setelah dana darurat aman dan bebas utang konsumtif berbunga tinggi, baru kamu bisa mulai alokasikan uang dingin untuk investasi.',
         createdAt: new Date(Date.now() - 110 * 3600 * 1000).toISOString(),
+      },
+      {
+        id: 'rep-4-2',
+        authorName: 'Bima Satria',
+        authorRole: 'Community Member',
+        content: 'Makasih penjelasannya Kak! Jadi amannya kumpulin dana darurat dulu ya baru mikir portofolio saham.',
+        createdAt: new Date(Date.now() - 95 * 3600 * 1000).toISOString(),
+      }
+    ]
+  },
+  {
+    id: 'disc-5',
+    title: 'Strategi memisahkan rekening bank: Berapa rekening yang kalian pakai sehari-hari?',
+    category: 'pengelolaan_uang',
+    authorName: 'Aulia Rahmani',
+    authorRole: 'Community Member',
+    content: 'Dulu saya cuma pakai 1 rekening untuk gaji, jajan, dan tabungan. Akhirnya saldo selalu habis tanpa jejak. Sekarang mau coba metode multiple bank account. Teman-teman di sini biasanya bagi jadi berapa rekening?',
+    createdAt: new Date(Date.now() - 48 * 3600 * 1000).toISOString(),
+    replies: [
+      {
+        id: 'rep-5-1',
+        authorName: 'Gita Saraswati',
+        authorRole: 'Community Member',
+        content: 'Aku pakai sistem 3 Rekening:\n1. Rekening Gaji & Kebutuhan Rutin (Sewa kos, listrik, makan, wifi)\n2. Rekening Tabungan & Dana Darurat (Tidak ada kartu ATM, tidak diinstal di HP utama)\n3. Rekening Jajan / Operasional Harian (Ini yang diisi kuota mingguan buat kopi, nongkrong, nonton).\nKalau kuota di rekening 3 habis, ya puasa jajan sampai minggu depan!',
+        createdAt: new Date(Date.now() - 40 * 3600 * 1000).toISOString(),
+      },
+      {
+        id: 'rep-5-2',
+        authorName: 'Dimas Kurnia',
+        authorRole: 'Member',
+        content: 'Setuju dengan sistem 3 kantong. Sekarang banyak bank digital yang punya fitur sub-wallet/kantong dalam satu akun jadi gak perlu bayar banyak biaya admin bulanan.',
+        createdAt: new Date(Date.now() - 25 * 3600 * 1000).toISOString(),
+      }
+    ]
+  },
+  {
+    id: 'disc-6',
+    title: 'Mau beli laptop gaming 12 juta tapi ragu: Kebutuhan atau sekadar Keinginan?',
+    category: 'investasi_dasar',
+    authorName: 'Eko Prasetyo',
+    authorRole: 'Community Member',
+    content: 'Pekerjaan saya freelance graphic design & video editor. Laptop lama sudah 5 tahun dan render video suka ngelag parah. Harga laptop incaran 12 juta. Tabungan ada 18 juta. Apakah ini pembelian yang bijak atau sebaiknya tahan dulu?',
+    createdAt: new Date(Date.now() - 24 * 3600 * 1000).toISOString(),
+    replies: [
+      {
+        id: 'rep-6-1',
+        authorName: 'Hendra Saputra',
+        authorRole: 'Mindful Creator',
+        content: 'Kalau laptop tersebut adalah alat produksi primer yang langsung menghasilkan uang dan laptop lama sudah memakan waktu kerja (opportunity loss), ini masuk kategori Belanja Produktif / Kebutuhan Kerja, bukan sekadar gaya hidup. Tapi pastikan sisa 6 juta tabungan masih cukup untuk dana darurat minimal 1-2 bulan ya!',
+        createdAt: new Date(Date.now() - 16 * 3600 * 1000).toISOString(),
+      },
+      {
+        id: 'rep-6-2',
+        authorName: 'Buy or Bye Mentor',
+        authorRole: 'Financial Educator',
+        content: 'Tips tambahan: coba hitung Payback Period-nya. Jika laptop baru bisa mempercepat editing 2x lipat dan kamu bisa ambil 2 klien tambahan per bulan, dalam waktu berapa bulan harga 12 juta itu balik modal? Jika di bawah 4 bulan, pembelian ini sangat rasional.',
+        createdAt: new Date(Date.now() - 10 * 3600 * 1000).toISOString(),
       }
     ]
   }

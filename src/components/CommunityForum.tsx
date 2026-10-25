@@ -25,6 +25,131 @@ interface CommunityForumProps {
   user: User | null;
 }
 
+const DEFAULT_COMMUNITY_DISCUSSIONS: CommunityDiscussion[] = [
+  {
+    id: 'disc-1',
+    title: 'Gaji UMR mau mulai budgeting 50/30/20 tapi biaya kos mahal, gimana solusinya?',
+    category: 'budgeting',
+    authorName: 'Dina K.',
+    authorRole: 'Community Member',
+    content: 'Halo teman-teman Buy or Bye! Penghasilan saya sekitar Rp 4,5 juta/bulan di kota besar. Sekarang biaya kosan + listrik habis Rp 1,6 juta sendiri (hampir 36%). Mau terapkan 50/30/20 susah banget di pos kebutuhan pokok (50%). Adakah yang punya formula alternatif budgeting yang lebih realistis untuk perantau?',
+    createdAt: new Date(Date.now() - 36 * 3600 * 1000).toISOString(),
+    replies: [
+      {
+        id: 'rep-1-1',
+        authorName: 'Rian Pratama',
+        authorRole: 'Budgeting Enthusiast',
+        content: 'Halo Dina! Rumus 50/30/20 dari Elizabeth Warren memang aslinya dirancang untuk kondisi biaya hidup seimbang. Buat perantau kota besar, kamu bisa pakai formula adaptif 60/20/20 atau 65/20/15: 60-65% Kebutuhan Pokok, 20% Tabungan/Dana Darurat, dan 15-20% Gaya Hidup & Self-Reward terukur.',
+        createdAt: new Date(Date.now() - 30 * 3600 * 1000).toISOString(),
+      },
+      {
+        id: 'rep-1-2',
+        authorName: 'Siti Rahma',
+        authorRole: 'Community Member',
+        content: 'Setuju banget sama Kak Rian. Dulu kos sendirian bikin boncos, tahun kedua aku ajak teman sekantor buat sewa kamar berdua (twin bed). Biaya kos langsung kepotong 40%!',
+        createdAt: new Date(Date.now() - 18 * 3600 * 1000).toISOString(),
+      }
+    ]
+  },
+  {
+    id: 'disc-2',
+    title: 'Pengalaman lepas dari jeratan PayLater 4 aplikasi berbeda dalam 6 bulan',
+    category: 'utang_paylater',
+    authorName: 'Kevin Wardhana',
+    authorRole: 'Financial Survivor',
+    content: 'Tahun lalu saya sempat punya tagihan paylater menumpuk sampai total 14 juta karena kebiasaan checkout makanan pesan antar & beli sneakers dicicil 12 bulan. Tiap awal bulan gaji numpang lewat buat bayar cicilan. Saya berhasil lunas pakai metode Snowball Debt. Mau berbagi cerita sekaligus kasih semangat buat yang lagi berjuang lunasin cicilan!',
+    createdAt: new Date(Date.now() - 72 * 3600 * 1000).toISOString(),
+    replies: [
+      {
+        id: 'rep-2-1',
+        authorName: 'Amanda Putri',
+        authorRole: 'Community Member',
+        content: 'Keren banget Kak Kevin! Boleh sharing urutan langkah Snowball Debt-nya? Aku lagi ada 2 tagihan paylater kecil dan 1 pinjaman gadget yang lumayan bikin pusing.',
+        createdAt: new Date(Date.now() - 60 * 3600 * 1000).toISOString(),
+      },
+      {
+        id: 'rep-2-2',
+        authorName: 'Kevin Wardhana',
+        authorRole: 'Financial Survivor',
+        content: 'Hai Amanda! Urutkan utang dari saldo nominal pokok paling KECIL sampai paling BESAR, tanpa lihat bunganya dulu. Bayar batas minimum untuk semua akun, tapi semua sisa uang bebas difokuskan babat habis akun terkecil pertama.',
+        createdAt: new Date(Date.now() - 48 * 3600 * 1000).toISOString(),
+      }
+    ]
+  },
+  {
+    id: 'disc-3',
+    title: 'Trik ampuh menahan "Checkout Tengah Malam" pas lagi doom scrolling diskon',
+    category: 'belanja_impulsif',
+    authorName: 'Nadia S.',
+    authorRole: 'Community Member',
+    content: 'Tiap jam 11 malam ke atas rasanya jari gatal pengen buka marketplace. Algoritma rekomendasi racun banget dan sering berakhir checkout barang gak penting. Ada tips konkrit selain hapus aplikasi?',
+    createdAt: new Date(Date.now() - 12 * 3600 * 1000).toISOString(),
+    replies: [
+      {
+        id: 'rep-3-1',
+        authorName: 'Fajar Nugraha',
+        authorRole: 'Mindful Spender',
+        content: 'Trik terbaik: hapus fitur One-Click Checkout dan unlink kartu kredit/debit instan dari aplikasi. Setiap mau bayar, paksa dirimu bayar via transfer manual. Hambatan (friction) 2 menit ini 90% efektif bikin sadar dan batal checkout!',
+        createdAt: new Date(Date.now() - 8 * 3600 * 1000).toISOString(),
+      }
+    ]
+  },
+  {
+    id: 'disc-4',
+    title: 'Berapa idealnya dana darurat sebelum mulai beli instrumen investasi?',
+    category: 'menabung',
+    authorName: 'Bima Satria',
+    authorRole: 'Community Member',
+    content: 'Banyak teman seumuran langsung fomo beli saham atau kripto padahal rekening tabungan tipis. Sebenarnya kapan saat yang tepat dan aman buat mulai investasi bagi pemula yang baru bekerja?',
+    createdAt: new Date(Date.now() - 120 * 3600 * 1000).toISOString(),
+    replies: [
+      {
+        id: 'rep-4-1',
+        authorName: 'Buy or Bye Mentor',
+        authorRole: 'Financial Educator',
+        content: 'Hai Bima! Fondasi piramida finansial adalah Dana Darurat minimal 3 bulan biaya hidup pokok (untuk lajang) atau 6 bulan (jika sudah berkeluarga). Dana darurat harus disimpan di instrumen likuid bebas fluktuasi pasar modal (RDPU/deposito). Setelah dana darurat aman, baru mulai investasi.',
+        createdAt: new Date(Date.now() - 110 * 3600 * 1000).toISOString(),
+      }
+    ]
+  },
+  {
+    id: 'disc-5',
+    title: 'Strategi memisahkan rekening bank: Berapa rekening yang kalian pakai sehari-hari?',
+    category: 'pengelolaan_uang',
+    authorName: 'Aulia Rahmani',
+    authorRole: 'Community Member',
+    content: 'Dulu saya cuma pakai 1 rekening untuk gaji, jajan, dan tabungan. Akhirnya saldo selalu habis tanpa jejak. Sekarang mau coba metode multiple bank account. Teman-teman di sini biasanya bagi jadi berapa rekening?',
+    createdAt: new Date(Date.now() - 48 * 3600 * 1000).toISOString(),
+    replies: [
+      {
+        id: 'rep-5-1',
+        authorName: 'Gita Saraswati',
+        authorRole: 'Community Member',
+        content: 'Aku pakai sistem 3 Rekening: 1. Rekening Gaji & Kebutuhan Rutin, 2. Rekening Tabungan & Dana Darurat (tanpa ATM), 3. Rekening Jajan / Operasional Harian dengan jatah kuota mingguan.',
+        createdAt: new Date(Date.now() - 40 * 3600 * 1000).toISOString(),
+      }
+    ]
+  },
+  {
+    id: 'disc-6',
+    title: 'Mau beli laptop gaming 12 juta tapi ragu: Kebutuhan atau sekadar Keinginan?',
+    category: 'investasi_dasar',
+    authorName: 'Eko Prasetyo',
+    authorRole: 'Community Member',
+    content: 'Pekerjaan saya freelance graphic design & video editor. Laptop lama sudah 5 tahun dan render video suka ngelag parah. Harga laptop incaran 12 juta. Tabungan ada 18 juta. Apakah ini pembelian yang bijak?',
+    createdAt: new Date(Date.now() - 24 * 3600 * 1000).toISOString(),
+    replies: [
+      {
+        id: 'rep-6-1',
+        authorName: 'Hendra Saputra',
+        authorRole: 'Mindful Creator',
+        content: 'Kalau laptop tersebut adalah alat produksi primer yang langsung menghasilkan uang dan laptop lama memakan waktu kerja, ini masuk kategori Belanja Produktif / Kebutuhan Kerja. Tapi pastikan sisa tabungan masih cukup untuk dana darurat!',
+        createdAt: new Date(Date.now() - 16 * 3600 * 1000).toISOString(),
+      }
+    ]
+  }
+];
+
 export const CommunityForum: React.FC<CommunityForumProps> = ({ language, user }) => {
   const [discussions, setDiscussions] = useState<CommunityDiscussion[]>([]);
   const [loading, setLoading] = useState(true);
@@ -60,9 +185,23 @@ export const CommunityForum: React.FC<CommunityForumProps> = ({ language, user }
       const res = await fetch(`/api/discussions?${params.toString()}`);
       if (!res.ok) throw new Error('Gagal memuat diskusi');
       const data = await res.json();
-      setDiscussions(data.discussions || []);
+      if (data.discussions && data.discussions.length > 0) {
+        setDiscussions(data.discussions);
+      } else {
+        // Fallback default sample discussions filtered by category
+        let fallback = [...DEFAULT_COMMUNITY_DISCUSSIONS];
+        if (selectedCategory !== 'all') {
+          fallback = fallback.filter(d => d.category === selectedCategory);
+        }
+        setDiscussions(fallback);
+      }
     } catch (err) {
-      console.error('Fetch discussions error:', err);
+      console.error('Fetch discussions error, using default seed:', err);
+      let fallback = [...DEFAULT_COMMUNITY_DISCUSSIONS];
+      if (selectedCategory !== 'all') {
+        fallback = fallback.filter(d => d.category === selectedCategory);
+      }
+      setDiscussions(fallback);
     } finally {
       setLoading(false);
     }
