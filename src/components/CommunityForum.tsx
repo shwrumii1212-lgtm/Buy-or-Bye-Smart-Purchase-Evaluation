@@ -150,6 +150,35 @@ const DEFAULT_COMMUNITY_DISCUSSIONS: CommunityDiscussion[] = [
   }
 ];
 
+const COMMUNITY_LOCAL_STORAGE_KEY = 'buyorbye_community_discussions_v2';
+
+function loadStoredDiscussions(): CommunityDiscussion[] {
+  try {
+    const raw = localStorage.getItem(COMMUNITY_LOCAL_STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
+      }
+    }
+  } catch (err) {
+    console.error('Failed to parse local discussions:', err);
+  }
+  // Initialize with seed data
+  try {
+    localStorage.setItem(COMMUNITY_LOCAL_STORAGE_KEY, JSON.stringify(DEFAULT_COMMUNITY_DISCUSSIONS));
+  } catch {}
+  return [...DEFAULT_COMMUNITY_DISCUSSIONS];
+}
+
+function saveStoredDiscussions(items: CommunityDiscussion[]): void {
+  try {
+    localStorage.setItem(COMMUNITY_LOCAL_STORAGE_KEY, JSON.stringify(items));
+  } catch (err) {
+    console.error('Failed to save local discussions:', err);
+  }
+}
+
 export const CommunityForum: React.FC<CommunityForumProps> = ({ language, user }) => {
   const [discussions, setDiscussions] = useState<CommunityDiscussion[]>([]);
   const [loading, setLoading] = useState(true);
@@ -174,34 +203,46 @@ export const CommunityForum: React.FC<CommunityForumProps> = ({ language, user }
   const [replyError, setReplyError] = useState('');
   const [isSubmittingReply, setIsSubmittingReply] = useState(false);
 
-  // Fetch discussions from API
+  // Load & Filter discussions (works seamlessly offline, static GitHub Pages, and with API)
+  const filterAndSetList = (sourceList: CommunityDiscussion[]) => {
+    let filtered = [...sourceList];
+    if (selectedCategory !== 'all') {
+      filtered = filtered.filter(d => d.category === selectedCategory);
+    }
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      filtered = filtered.filter(d => 
+        d.title.toLowerCase().includes(q) ||
+        d.content.toLowerCase().includes(q) ||
+        d.authorName.toLowerCase().includes(q)
+      );
+    }
+    setDiscussions(filtered);
+  };
+
   const fetchDiscussions = async () => {
     setLoading(true);
+    // 1. Always load current discussions from localStorage immediately
+    const localData = loadStoredDiscussions();
+    filterAndSetList(localData);
+
+    // 2. Attempt sync with backend API if available
     try {
       const params = new URLSearchParams();
       if (selectedCategory !== 'all') params.append('category', selectedCategory);
       if (searchQuery.trim()) params.append('search', searchQuery.trim());
 
       const res = await fetch(`/api/discussions?${params.toString()}`);
-      if (!res.ok) throw new Error('Gagal memuat diskusi');
-      const data = await res.json();
-      if (data.discussions && data.discussions.length > 0) {
-        setDiscussions(data.discussions);
-      } else {
-        // Fallback default sample discussions filtered by category
-        let fallback = [...DEFAULT_COMMUNITY_DISCUSSIONS];
-        if (selectedCategory !== 'all') {
-          fallback = fallback.filter(d => d.category === selectedCategory);
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data.discussions) && data.discussions.length > 0) {
+          setDiscussions(data.discussions);
+          saveStoredDiscussions(data.discussions);
         }
-        setDiscussions(fallback);
       }
     } catch (err) {
-      console.error('Fetch discussions error, using default seed:', err);
-      let fallback = [...DEFAULT_COMMUNITY_DISCUSSIONS];
-      if (selectedCategory !== 'all') {
-        fallback = fallback.filter(d => d.category === selectedCategory);
-      }
-      setDiscussions(fallback);
+      // In static GitHub Pages deployment, fetch fails gracefully and localData stays active
+      console.log('Static host mode active, running via persistent client storage');
     } finally {
       setLoading(false);
     }
@@ -216,20 +257,31 @@ export const CommunityForum: React.FC<CommunityForumProps> = ({ language, user }
     fetchDiscussions();
   };
 
-  // Open single discussion
+  // Open single discussion (Guaranteed to work on GitHub Pages + offline)
   const handleOpenDiscussion = async (discId: string) => {
+    // 1. Immediately find in current state or localStorage
+    const localList = loadStoredDiscussions();
+    const foundLocal = discussions.find(d => d.id === discId) || localList.find(d => d.id === discId);
+    
+    if (foundLocal) {
+      setActiveDiscussion(foundLocal);
+    }
+
+    // 2. Try fetching freshest data from backend if present
     try {
       const res = await fetch(`/api/discussions/${discId}`);
       if (res.ok) {
         const data = await res.json();
-        setActiveDiscussion(data.discussion);
+        if (data.discussion) {
+          setActiveDiscussion(data.discussion);
+        }
       }
     } catch (err) {
-      console.error('Failed to open discussion:', err);
+      // On GitHub Pages, foundLocal is already set and ready!
     }
   };
 
-  // Submit new discussion
+  // Submit new discussion (Works on both static GitHub Pages & dynamic server)
   const handleCreateDiscussion = async (e: React.FormEvent) => {
     e.preventDefault();
     setCreateError('');
@@ -244,43 +296,49 @@ export const CommunityForum: React.FC<CommunityForumProps> = ({ language, user }
     }
 
     setIsSubmittingDisc(true);
+    const newDisc: CommunityDiscussion = {
+      id: `disc_${Date.now()}`,
+      title: newTitle.trim(),
+      category: newCategory,
+      content: newContent.trim(),
+      authorName: newAuthorName.trim() || user?.name || (language === 'id' ? 'Teman Bijak' : 'Mindful Peer'),
+      authorRole: user ? 'Registered Member' : 'Community Member',
+      createdAt: new Date().toISOString(),
+      replies: []
+    };
+
+    // Save to persistent localStorage first (works on GitHub Pages!)
+    const currentList = loadStoredDiscussions();
+    const updatedList = [newDisc, ...currentList];
+    saveStoredDiscussions(updatedList);
+    filterAndSetList(updatedList);
+
+    // Try sending to backend if API is live
     try {
-      const res = await fetch('/api/discussions', {
+      await fetch('/api/discussions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title: newTitle,
-          category: newCategory,
-          content: newContent,
-          authorName: newAuthorName.trim() || user?.name || (language === 'id' ? 'Teman Bijak' : 'Mindful Peer'),
-          authorRole: user ? 'Registered Member' : 'Community Member'
+          title: newDisc.title,
+          category: newDisc.category,
+          content: newDisc.content,
+          authorName: newDisc.authorName,
+          authorRole: newDisc.authorRole
         })
       });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Gagal membuat diskusi');
-      }
-
-      const data = await res.json();
-      // Reset form
-      setNewTitle('');
-      setNewContent('');
-      setIsCreatingDiscussion(false);
-      
-      // Refresh list & open newly created discussion
-      await fetchDiscussions();
-      if (data.discussion) {
-        setActiveDiscussion(data.discussion);
-      }
-    } catch (err: any) {
-      setCreateError(err.message || 'Gagal mengirim diskusi.');
-    } finally {
-      setIsSubmittingDisc(false);
+    } catch (err) {
+      // Static host fallback
     }
+
+    // Reset form & open newly created discussion
+    setNewTitle('');
+    setNewContent('');
+    setIsCreatingDiscussion(false);
+    setActiveDiscussion(newDisc);
+    setIsSubmittingDisc(false);
   };
 
-  // Submit reply
+  // Submit reply (Works on both static GitHub Pages & dynamic server)
   const handleAddReply = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!activeDiscussion) return;
@@ -292,30 +350,48 @@ export const CommunityForum: React.FC<CommunityForumProps> = ({ language, user }
     }
 
     setIsSubmittingReply(true);
+
+    const newReply: CommunityReply = {
+      id: `rep_${Date.now()}`,
+      authorName: replyAuthorName.trim() || user?.name || (language === 'id' ? 'Sahabat Finansial' : 'Community Friend'),
+      authorRole: user ? 'Verified Member' : 'Member',
+      content: replyContent.trim(),
+      createdAt: new Date().toISOString()
+    };
+
+    const updatedDisc: CommunityDiscussion = {
+      ...activeDiscussion,
+      replies: [...activeDiscussion.replies, newReply]
+    };
+
+    // Update localStorage immediately (Guarantees immediate display on GitHub Pages!)
+    const allDiscussions = loadStoredDiscussions();
+    const discIndex = allDiscussions.findIndex(d => d.id === activeDiscussion.id);
+    if (discIndex >= 0) {
+      allDiscussions[discIndex] = updatedDisc;
+    } else {
+      allDiscussions.unshift(updatedDisc);
+    }
+    saveStoredDiscussions(allDiscussions);
+    filterAndSetList(allDiscussions);
+
+    // Set active discussion state directly
+    setActiveDiscussion(updatedDisc);
+    setReplyContent('');
+
+    // Try posting to API in background if server exists
     try {
-      const res = await fetch(`/api/discussions/${activeDiscussion.id}/replies`, {
+      await fetch(`/api/discussions/${activeDiscussion.id}/replies`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          content: replyContent,
-          authorName: replyAuthorName.trim() || user?.name || (language === 'id' ? 'Sahabat Finansial' : 'Community Friend'),
-          authorRole: user ? 'Verified Member' : 'Member'
+          content: newReply.content,
+          authorName: newReply.authorName,
+          authorRole: newReply.authorRole
         })
       });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Gagal mengirim balasan');
-      }
-
-      const data = await res.json();
-      setReplyContent('');
-      setActiveDiscussion(data.discussion);
-      
-      // Also update in list in background
-      fetchDiscussions();
-    } catch (err: any) {
-      setReplyError(err.message || 'Gagal membalas diskusi.');
+    } catch (err) {
+      // Static host fallback
     } finally {
       setIsSubmittingReply(false);
     }
