@@ -13,21 +13,25 @@ import {
   ArrowLeft,
   MessageSquare,
   Instagram,
-  ExternalLink
+  ExternalLink,
+  Users,
+  ArrowRight,
+  X
 } from 'lucide-react';
-import { Language } from '../types';
+import { Language, User } from '../types';
+import { CommunityForum } from '../components/CommunityForum';
 import { translations } from '../utils/translations';
 
 interface AboutUsViewProps {
   language: Language;
   onNavigate?: (view: string) => void;
+  user?: User | null;
 }
 
-export const AboutUsView: React.FC<AboutUsViewProps> = ({ language, onNavigate }) => {
+export const AboutUsView: React.FC<AboutUsViewProps> = ({ language, onNavigate, user = null }) => {
   const t = translations[language];
-  const [conversationOpen, setConversationOpen] = useState(false);
-  const [conversationText, setConversationText] = useState('');
-  const [messageSent, setMessageSent] = useState(false);
+  const [showForumModal, setShowForumModal] = useState<boolean>(false);
+
 
   return (
     <div className="space-y-12 pb-16 max-w-4xl mx-auto">
@@ -50,7 +54,7 @@ export const AboutUsView: React.FC<AboutUsViewProps> = ({ language, onNavigate }
           <Sparkles className="w-3.5 h-3.5 text-[#6B8BA4]" />
           <span>Mindful Consumer Movement</span>
         </div>
-        <h1 className="font-heading text-3xl sm:text-4xl font-extrabold text-[#24303E]">
+        <h1 className="font-berkshire text-3xl sm:text-4xl font-extrabold text-[#24303E]">
           {t.aboutTitle}
         </h1>
         <p className="text-xs sm:text-base text-[#55697A] max-w-xl mx-auto leading-relaxed">
@@ -74,22 +78,42 @@ export const AboutUsView: React.FC<AboutUsViewProps> = ({ language, onNavigate }
         </div>
       </div>
 
-      {/* Mission & Purpose */}
-      <section className="p-8 rounded-3xl bg-white border border-[#E2EAF0] shadow-xs space-y-4">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-[#E2EAF0] text-[#6B8BA4] flex items-center justify-center">
-            <Heart className="w-4 h-4" />
+      {/* Cerita di Balik Kehadiran Buy or Bye (Tanpa kata 'Misi' / Tanpa kata 'Our Story') */}
+      <section className="p-8 sm:p-10 rounded-3xl bg-white border border-[#E2EAF0] shadow-xs space-y-5">
+        <div className="flex items-center gap-2.5">
+          <div className="w-9 h-9 rounded-xl bg-[#E2EAF0] text-[#6B8BA4] flex items-center justify-center shrink-0">
+            <Heart className="w-5 h-5 text-[#6B8BA4]" />
           </div>
-          <h2 className="font-heading text-xl font-bold text-[#24303E]">
-            {t.missionTitle}
+          <h2 className="font-heading text-2xl font-bold text-[#24303E]">
+            {language === 'id' 
+              ? 'Mengapa Buy or Bye Hadir untuk Menemanimu' 
+              : 'Why Buy or Bye Was Created for You'}
           </h2>
         </div>
-        <p className="text-sm text-[#506272] leading-relaxed">
-          {t.missionDesc}
-        </p>
-        <p className="text-sm text-[#506272] leading-relaxed">
-          Di era e-commerce serba satu kali klik, algoritma rekomendasi terus membanjiri kita dengan diskon semu dan flash sale. Kami menciptakan <strong>Buy or Bye</strong> sebagai lapisan pertahanan rasional—sebuah "gatekeeper" yang berdiri di antara keranjang belanjamu dan rekening bankmu.
-        </p>
+
+        <div className="space-y-4 text-sm sm:text-base text-[#475A6C] leading-relaxed">
+          <p>
+            Pernahkah kamu scrolling marketplace tengah malam, memasukkan barang ke keranjang karena label diskon merah menyala, lalu checkout hanya karena takut kehabisan? Keesokan harinya ketika kurir tiba, yang tersisa seringkali bukan rasa puas, melainkan sedikit rasa bersalah saat melihat mutasi rekening atau tagihan paylater yang mulai menumpuk.
+          </p>
+          <p>
+            Kita hidup di era di mana algoritma e-commerce sengaja dirancang untuk memicu dopamin instan lewat flash sale, countdown timer, dan kemudahan tombol sekali klik. <strong>Buy or Bye</strong> lahir dari keresahan nyata sehari-hari generasi muda: bagaimana caranya tetap bisa menikmati hasil kerja keras dan membeli barang yang disukai, tanpa harus terjebak dalam siklus konsumerisme impulsif.
+          </p>
+          <p>
+            Platform ini bukan tentang melarangmu bersenang-senang, melainkan menjadi teman berpikir rasional—sebuah <em>gatekeeper</em> kecil yang memberimu jeda bernapas sejenak sebelum checkout, menghitung nilai nyata barang terhadap jam kerja hidupmu, dan memastikan masa depan finansialmu tetap aman serta terjaga.
+          </p>
+        </div>
+      </section>
+
+      {/* Quote Motivasi Berkelas - Terinspirasi dari Referensi Desain */}
+      <section className="p-8 sm:p-12 rounded-3xl bg-white border border-[#E2EAF0] shadow-sm">
+        <div className="relative pl-6 sm:pl-8 py-2 border-l-[3.5px] border-[#D4A359]">
+          <blockquote className="font-quote text-xl sm:text-2xl md:text-[26px] text-[#1E2B37] leading-relaxed md:leading-[1.7] tracking-normal font-normal">
+            &ldquo;We believe a household budget should be a five-minute weekly habit, not a spreadsheet you avoid until the end of the month.&rdquo;
+          </blockquote>
+          <p className="mt-4 text-xs font-semibold text-[#8C7A62] tracking-wider uppercase">
+            — Mindful Financial Philosophy
+          </p>
+        </div>
       </section>
 
       {/* Transparent Rule-Based Methodology */}
@@ -183,85 +207,71 @@ export const AboutUsView: React.FC<AboutUsViewProps> = ({ language, onNavigate }
         </a>
       </section>
 
-      {/* Start Conversation Section */}
-      <section className="p-8 rounded-3xl bg-gradient-to-br from-[#F8F6F2] via-white to-[#EAF0EB] border border-[#E2EAF0] shadow-xs space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="space-y-1">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E2EAF0] text-xs font-semibold text-[#506A80]">
-              <MessageSquare className="w-3.5 h-3.5 text-[#6B8BA4]" />
-              <span>{language === 'id' ? 'Komunitas & Diskusi Finansial' : 'Mindful Community & Q&A'}</span>
-            </div>
-            <h2 className="font-heading text-xl font-bold text-[#24303E]">
-              {language === 'id' ? 'Punya Pertanyaan Seputar Kebiasaan Belanja?' : 'Questions About Mindful Spending Habits?'}
-            </h2>
-            <p className="text-xs text-[#5C6F80] max-w-xl">
-              {language === 'id' 
-                ? 'Diskusikan keraguan sebelum checkout, bagikan pengalaman menolak FOMO, atau konsultasikan pengelolaan dana darurat dengan tim kami.'
-                : 'Share your questions on curbing impulse buys, navigating paylater debts, or personal finance coaching.'}
-            </p>
+      {/* Komunitas & Forum Diskusi Finansial: Kotak Ringkas & Elegan */}
+      <section id="community-forum" className="p-7 sm:p-8 rounded-3xl bg-gradient-to-br from-white via-[#F8F6F2] to-[#EAF0EB] border border-[#E2EAF0] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-6 transition-all hover:border-[#6B8BA4]/40">
+        <div className="space-y-2 max-w-xl">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E2EAF0] text-xs font-semibold text-[#506A80]">
+            <MessageSquare className="w-3.5 h-3.5 text-[#6B8BA4]" />
+            <span>{language === 'id' ? 'Komunitas & Diskusi Finansial' : 'Mindful Community & Q&A'}</span>
           </div>
-          <button
-            type="button"
-            onClick={() => setConversationOpen(true)}
-            className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-[#6B8BA4] hover:bg-[#587893] text-white text-xs font-heading font-extrabold shadow-sm transition-all cursor-pointer shrink-0"
-          >
-            <MessageSquare className="w-4 h-4" />
-            <span>{t.startConversation}</span>
-          </button>
+          <h2 className="font-heading text-xl sm:text-2xl font-bold text-[#24303E]">
+            {language === 'id' ? 'Forum Komunitas & Diskusi Finansial' : 'Community Forum & Discussions'}
+          </h2>
+          <p className="text-xs sm:text-sm text-[#5C6F80] leading-relaxed">
+            {language === 'id' 
+              ? 'Ruang saling dukung untuk menahan dorongan belanja impulsif, berbagi cerita melunasi paylater, hingga berdiskusi sebelum checkout bersama teman sefrekuensi.'
+              : 'A supportive community space to curb impulse buys, navigate paylater habits, and discuss purchasing dilemmas with peers.'}
+          </p>
         </div>
 
-        {conversationOpen && (
-          <div className="mt-4 p-5 rounded-2xl bg-white border border-[#DCE4EC] space-y-3 animate-in fade-in">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-[#24303E]">
-                {language === 'id' ? 'Kirim Pesan / Topik Diskusi:' : 'Submit Message / Discussion Topic:'}
-              </span>
+        <button
+          type="button"
+          onClick={() => setShowForumModal(true)}
+          className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-[#6B8BA4] hover:bg-[#587893] text-white font-heading font-extrabold text-xs sm:text-sm shadow-md transition-all cursor-pointer shrink-0 hover:-translate-y-0.5 active:translate-y-0 ring-2 ring-[#6B8BA4]/20"
+        >
+          <MessageSquare className="w-4 h-4" />
+          <span>{language === 'id' ? 'Buka Diskusi' : 'Open Discussions'}</span>
+          <ArrowRight className="w-4 h-4 ml-0.5" />
+        </button>
+      </section>
+
+      {/* Modal / Dialog Forum Komunitas Lengkap */}
+      {showForumModal && (
+        <div className="fixed inset-0 z-50 bg-[#24303E]/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 animate-in fade-in">
+          <div className="bg-[#FAF9F6] w-full max-w-4xl max-h-[90vh] rounded-3xl border border-[#CBD7E2] shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-150">
+            {/* Modal Top Header */}
+            <div className="px-6 py-4 bg-white border-b border-[#E2EAF0] flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-[#E2EAF0] text-[#6B8BA4] flex items-center justify-center font-bold">
+                  <MessageSquare className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="font-heading font-bold text-sm sm:text-base text-[#24303E]">
+                    {language === 'id' ? 'Forum Komunitas Buy or Bye' : 'Buy or Bye Community Forum'}
+                  </h3>
+                  <p className="text-[11px] text-[#7A8C9E]">
+                    {language === 'id' ? 'Diskusi terbuka, bebas julgmen & saling menguatkan' : 'Supportive and judgment-free discussions'}
+                  </p>
+                </div>
+              </div>
+
               <button
                 type="button"
-                onClick={() => setConversationOpen(false)}
-                className="text-xs text-[#7A8C9E] hover:text-[#24303E] cursor-pointer"
+                onClick={() => setShowForumModal(false)}
+                className="w-8 h-8 rounded-full bg-[#F0F4F8] hover:bg-[#E2EAF0] text-[#55697A] hover:text-[#24303E] flex items-center justify-center transition-colors cursor-pointer"
+                title={language === 'id' ? 'Tutup' : 'Close'}
               >
-                ✕ {language === 'id' ? 'Tutup' : 'Close'}
+                <X className="w-4 h-4" />
               </button>
             </div>
-            {messageSent ? (
-              <div className="p-3.5 rounded-xl bg-[#ECFDF5] border border-[#10B981] text-xs font-bold text-[#065F46] flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-[#059669]" />
-                <span>
-                  {language === 'id'
-                    ? 'Pesan kamu telah terkirim! Terima kasih telah berkontribusi dalam gerakan belanja bijak.'
-                    : 'Your message has been sent! Thank you for participating in the mindful spending movement.'}
-                </span>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                <textarea
-                  rows={3}
-                  value={conversationText}
-                  onChange={(e) => setConversationText(e.target.value)}
-                  placeholder={language === 'id' ? 'Tuliskan unek-unek belanja impulsif, pertanyaan budgeting, atau masukanmu...' : 'Type your spending question, budgeting thoughts, or feedback...'}
-                  className="w-full p-3 text-xs rounded-xl border border-[#CFDCE6] bg-[#FBFBFA] focus:ring-2 focus:ring-[#6B8BA4]/30"
-                />
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (!conversationText.trim()) return;
-                    setMessageSent(true);
-                    setTimeout(() => {
-                      setMessageSent(false);
-                      setConversationText('');
-                      setConversationOpen(false);
-                    }, 2500);
-                  }}
-                  className="px-4 py-2 rounded-xl bg-[#059669] hover:bg-[#047857] text-white text-xs font-semibold cursor-pointer shadow-xs"
-                >
-                  {language === 'id' ? 'Kirim Pesan' : 'Send Message'}
-                </button>
-              </div>
-            )}
+
+            {/* Modal Body Container with Scroll */}
+            <div className="p-4 sm:p-6 overflow-y-auto flex-1">
+              <CommunityForum language={language} user={user} />
+            </div>
           </div>
-        )}
-      </section>
+        </div>
+      )}
 
       {/* Privacy & Principles */}
       <section className="p-6 rounded-3xl bg-white border border-[#E2EAF0] flex items-center justify-between gap-4">
@@ -273,7 +283,7 @@ export const AboutUsView: React.FC<AboutUsViewProps> = ({ language, onNavigate }
             <h3 className="text-xs sm:text-sm font-bold text-[#24303E]">
               {language === 'id' ? 'Privasi Terjaga & Data Lokal' : 'Complete Client-Side Privacy'}
             </h3>
-            <p className="text-[11px] text-[#7A8C9E]">
+            <p className="text-xs text-[#7A8C9E]">
               {language === 'id'
                 ? 'Data profil finansial dan riwayat belanja tersimpan aman di perangkatmu secara terisolasi.'
                 : 'Your financial profiles and shopping evaluations remain private and client-side.'}

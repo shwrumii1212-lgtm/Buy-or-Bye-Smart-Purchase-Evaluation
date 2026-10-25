@@ -293,11 +293,11 @@ export function parseEcommerceUrl(rawUrl: string): ParsedUrlData {
 
   let message: string | undefined;
   if (!isValidUrl) {
-    message = 'Format URL belum valid. Pastikan menyertakan alamat web yang lengkap.';
+    message = 'Format tautan belum valid. Pastikan menyertakan link URL web yang lengkap.';
   } else if (hasExactData) {
-    message = `Produk terhubung: "${detectedName}" (${platform}) seharga Rp ${detectedPrice?.toLocaleString('id-ID')}.`;
+    message = `Tautan terhubung: "${detectedName}" (${platform}). Pastikan nominal harga riil barang di bawah telah sesuai sebelum evaluasi.`;
   } else {
-    message = `Nama produk berhasil dianalisis dari tautan ${platform}. Masukkan harga asli pada kolom harga di bawah untuk melanjutkan evaluasi objektif.`;
+    message = `Tautan ${platform} terhubung. Karena sistem keamanan enkripsi anti-bot dan privasi marketplace (${platform}), rincian nama atau harga real-time tidak dapat diekstrak 100% otomatis. Silakan lengkapi atau sesuaikan nama barang & harga asli pada kolom di bawah.`;
   }
 
   return {

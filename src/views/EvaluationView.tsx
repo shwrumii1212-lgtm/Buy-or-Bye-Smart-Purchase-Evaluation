@@ -43,7 +43,11 @@ export const EvaluationView: React.FC<EvaluationViewProps> = ({
 }) => {
   const t = translations[language];
 
+  // Mode input barang: bisa langsung murni manual tanpa link, atau tempel link produk jika ada
+  const [inputMode, setInputMode] = useState<'link' | 'manual'>('manual');
+
   // Form states
+
   const [productUrl, setProductUrl] = useState('');
   const [parsedData, setParsedData] = useState<ParsedUrlData | null>(null);
   const [productName, setProductName] = useState('');
@@ -52,8 +56,8 @@ export const EvaluationView: React.FC<EvaluationViewProps> = ({
   const [price, setPrice] = useState<number>(0);
   const [priceInputText, setPriceInputText] = useState('');
   
-  const [category, setCategory] = useState<ProductCategory>('fashion');
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('debit');
+  const [category, setCategory] = useState<ProductCategory | ''>('');
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | ''>('');
   const [paylaterTenorMonths, setPaylaterTenorMonths] = useState<number>(3);
   const [paylaterFeePercent, setPaylaterFeePercent] = useState<number>(2.95);
 
@@ -69,6 +73,21 @@ export const EvaluationView: React.FC<EvaluationViewProps> = ({
   const [psyFomoPressure, setPsyFomoPressure] = useState<'saw_on_social' | 'personal_need' | null>(null);
   const [psyDelayReady, setPsyDelayReady] = useState<'ready_to_wait' | 'urge_to_checkout_now' | null>(null);
   const [psyPostPurchaseMood, setPsyPostPurchaseMood] = useState<'guilt_potential' | 'confident_useful' | null>(null);
+
+  // Hitung pertanyaan pertama yang belum terjawab (active question pointer 1-9)
+  const getActiveQuestionIndex = () => {
+    if (psyNeedVsWant === null) return 1;
+    if (psyDiscountTrap === null) return 2;
+    if (psyFomoPressure === null) return 3;
+    if (psyDelayReady === null) return 4;
+    if (psyPostPurchaseMood === null) return 5;
+    if (urgencyScore === null) return 6;
+    if (hasSimilarItem === null) return 7;
+    if (usedFrequency === null) return 8;
+    if (coolingOffPassed === null) return 9;
+    return 10; // Semua sudah terjawab
+  };
+  const activeQ = getActiveQuestionIndex();
 
   // Validation state when user attempts to submit
   const [validationError, setValidationError] = useState<string | null>(null);
@@ -86,8 +105,8 @@ export const EvaluationView: React.FC<EvaluationViewProps> = ({
     setProductName('');
     setPrice(0);
     setPriceInputText('');
-    setCategory('fashion');
-    setPaymentMethod('debit');
+    setCategory('');
+    setPaymentMethod('');
     setPaylaterTenorMonths(3);
     setPaylaterFeePercent(2.95);
     setUrgencyScore(null);
@@ -140,9 +159,7 @@ export const EvaluationView: React.FC<EvaluationViewProps> = ({
       setPrice(parsed.detectedPrice);
       setPriceInputText(parsed.detectedPrice.toLocaleString('id-ID'));
     }
-    if (parsed.detectedCategory) {
-      setCategory(parsed.detectedCategory);
-    }
+    // Kategori dan metode pembayaran tetap dikosongkan agar pengguna menentukan sendiri
 
     if (parsed.hasExactData) {
       setAutoLinkedAlert(
@@ -153,13 +170,17 @@ export const EvaluationView: React.FC<EvaluationViewProps> = ({
     } else {
       setAutoLinkedAlert(parsed.message || null);
     }
-    setTimeout(() => setAutoLinkedAlert(null), 7000);
+    setTimeout(() => setAutoLinkedAlert(null), 12000);
   };
 
   // URL input change handler
   const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setProductUrl(val);
+    if (val.trim()) setInputMode('link');
+    if (val.trim()) {
+      setInputMode('link');
+    }
     if (val.trim().length > 10) {
       processUrlAndAutofill(val);
     } else {
@@ -169,6 +190,8 @@ export const EvaluationView: React.FC<EvaluationViewProps> = ({
 
   // Fast demo product links
   const handleSampleLink = (type: 'shopee' | 'tokopedia' | 'tiktok' | 'zalora') => {
+    setInputMode('link');
+    setInputMode('link');
     let url = '';
     if (type === 'shopee') {
       url = 'https://shopee.co.id/Sepatu-Sneakers-Casual-Canvas-Low-Top-i.12847.928172';
@@ -227,9 +250,9 @@ export const EvaluationView: React.FC<EvaluationViewProps> = ({
           userId,
           productUrl: productUrl.trim() || undefined,
           productName: productName.trim(),
-          category,
+          category: category as ProductCategory,
+          paymentMethod: paymentMethod as PaymentMethod,
           price,
-          paymentMethod,
           paylaterTenorMonths: paymentMethod === 'paylater' ? paylaterTenorMonths : undefined,
           paylaterFeePercent: paymentMethod === 'paylater' ? paylaterFeePercent : undefined,
           urgencyScore: urgencyScore ?? 3,
@@ -286,49 +309,14 @@ export const EvaluationView: React.FC<EvaluationViewProps> = ({
           <Sparkles className="w-3.5 h-3.5 text-[#6B8BA4]" />
           <span>Rule-Based Purchase Gatekeeper</span>
         </div>
-        <h1 className="font-heading text-2xl sm:text-3xl font-extrabold text-[#24303E]">
+        <h1 className="font-berkshire text-2xl sm:text-3xl font-extrabold text-[#24303E]">
           {t.evalTitle}
         </h1>
         <p className="text-xs sm:text-sm text-[#5C6F80] mt-1 max-w-xl">
           {t.evalSubtitle}
         </p>
 
-        {/* Quick Sample Links Bar */}
-        <div className="mt-5 pt-4 border-t border-[#EEF3F7]">
-          <span className="text-[11px] text-[#7A8C9E] font-bold uppercase tracking-wider block mb-2">
-            Contoh Tautan E-Commerce Cepat:
-          </span>
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              onClick={() => handleSampleLink('shopee')}
-              className="px-3 py-1.5 rounded-xl bg-[#F8F6F2] hover:bg-[#EFECE6] border border-[#DDE4EB] text-xs font-semibold text-[#485C6E] transition-all cursor-pointer flex items-center gap-1.5"
-            >
-              <span>🛒 Shopee (Sneakers)</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => handleSampleLink('tokopedia')}
-              className="px-3 py-1.5 rounded-xl bg-[#F8F6F2] hover:bg-[#EFECE6] border border-[#DDE4EB] text-xs font-semibold text-[#485C6E] transition-all cursor-pointer flex items-center gap-1.5"
-            >
-              <span>⌨️ Tokopedia (Keyboard)</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => handleSampleLink('tiktok')}
-              className="px-3 py-1.5 rounded-xl bg-[#F8F6F2] hover:bg-[#EFECE6] border border-[#DDE4EB] text-xs font-semibold text-[#485C6E] transition-all cursor-pointer flex items-center gap-1.5"
-            >
-              <span>✨ TikTok Shop (Skincare)</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => handleSampleLink('zalora')}
-              className="px-3 py-1.5 rounded-xl bg-[#F8F6F2] hover:bg-[#EFECE6] border border-[#DDE4EB] text-xs font-semibold text-[#485C6E] transition-all cursor-pointer flex items-center gap-1.5"
-            >
-              <span>🧥 Zalora (Hoodie)</span>
-            </button>
-          </div>
-        </div>
+
       </div>
 
       {/* Main Form */}
@@ -364,177 +352,227 @@ export const EvaluationView: React.FC<EvaluationViewProps> = ({
 
       <form onSubmit={handleEvaluate} className="space-y-6">
         
-        {/* Step 1: E-Commerce Link with Live Extraction */}
-        <div className="p-6 rounded-3xl bg-white border border-[#E2EAF0] shadow-xs space-y-4">
-          <div className="flex items-center justify-between">
+        {/* Bagian 1: Data Barang & Mode Input */}
+        <div className="p-6 rounded-3xl bg-white border border-[#E2EAF0] shadow-xs space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#EEF3F7]">
             <div className="flex items-center gap-2">
               <span className="w-6 h-6 rounded-full bg-[#E2EAF0] text-[#6B8BA4] font-bold text-xs flex items-center justify-center">
                 1
               </span>
               <h2 className="font-heading text-sm font-bold text-[#24303E]">
-                {t.urlInputLabel}
+                {language === 'id' ? 'Informasi Barang' : 'Item Information'}
               </h2>
             </div>
-            {productUrl && (
+
+            {/* Toggle Tab Buttons */}
+            <div className="flex items-center bg-[#F2F6F9] p-1 rounded-2xl border border-[#DCE4EC] shrink-0 self-start sm:self-auto">
               <button
                 type="button"
-                onClick={() => processUrlAndAutofill(productUrl)}
-                className="text-xs font-semibold text-[#6B8BA4] hover:text-[#527189] flex items-center gap-1 cursor-pointer"
+                onClick={() => setInputMode('manual')}
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  inputMode === 'manual'
+                    ? 'bg-white text-[#24303E] shadow-xs ring-1 ring-[#CBD7E2]'
+                    : 'text-[#617485] hover:text-[#24303E]'
+                }`}
               >
-                <RefreshCw className="w-3.5 h-3.5" />
-                <span>Ekstrak Ulang</span>
+                <ShoppingBag className="w-3.5 h-3.5 text-[#6B8BA4]" />
+                <span>{language === 'id' ? 'Input Manual' : 'Manual Input'}</span>
               </button>
-            )}
-          </div>
-
-          <div className="relative">
-            <LinkIcon className="w-4 h-4 text-[#8CA8BF] absolute left-3.5 top-3.5" />
-            <input
-              type="text"
-              value={productUrl}
-              onChange={handleUrlChange}
-              placeholder={t.urlInputPlaceholder}
-              className="w-full pl-10 pr-4 py-3 text-xs font-medium rounded-xl border border-[#CFDCE6] bg-[#FBFBFA] focus:ring-2 focus:ring-[#6B8BA4]/30 focus:border-[#6B8BA4] transition-all"
-            />
-          </div>
-
-          {/* Alert / Notice for linked product */}
-          {autoLinkedAlert && (
-            <div className="p-3.5 rounded-xl bg-[#F8F6F2] border border-[#D5DFE7] text-xs font-semibold text-[#334657] flex items-start gap-2.5 animate-in fade-in">
-              <Info className="w-4 h-4 text-[#6B8BA4] shrink-0 mt-0.5" />
-              <div className="leading-relaxed">{autoLinkedAlert}</div>
+              <button
+                type="button"
+                onClick={() => setInputMode('link')}
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  inputMode === 'link'
+                    ? 'bg-white text-[#24303E] shadow-xs ring-1 ring-[#CBD7E2]'
+                    : 'text-[#617485] hover:text-[#24303E]'
+                }`}
+              >
+                <LinkIcon className="w-3.5 h-3.5 text-[#6B8BA4]" />
+                <span>{language === 'id' ? 'Pakai Link' : 'Use Link'}</span>
+              </button>
             </div>
-          )}
+          </div>
 
-          {/* Connected Link Preview Card */}
-          {parsedData && parsedData.platform && (
-            <div className="p-4 rounded-2xl bg-[#F8F6F2] border border-[#E2EAF0] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="px-2.5 py-0.5 rounded-md bg-[#6B8BA4] text-white text-[10px] font-bold uppercase tracking-wider">
-                    {parsedData.platform}
-                  </span>
-                  <span className="text-[11px] font-semibold text-[#47634F] flex items-center gap-1">
-                    <CheckCircle2 className="w-3.5 h-3.5" /> Tautan Terhubung
+          {/* Jika Mode Link dipilih, tampilkan input field URL e-commerce */}
+          {inputMode === 'link' && (
+            <div className="space-y-3.5 pt-1 animate-in fade-in duration-200">
+              <div className="flex items-center justify-between">
+                <label className="block text-xs font-bold text-[#24303E]">
+                  {t.urlInputLabel}
+                </label>
+                {productUrl && (
+                  <button
+                    type="button"
+                    onClick={() => processUrlAndAutofill(productUrl)}
+                    className="text-xs font-semibold text-[#6B8BA4] hover:text-[#527189] flex items-center gap-1 cursor-pointer"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" />
+                    <span>Ekstrak Ulang</span>
+                  </button>
+                )}
+              </div>
+
+              <div className="relative">
+                <LinkIcon className="w-4 h-4 text-[#8CA8BF] absolute left-3.5 top-3.5" />
+                <input
+                  type="text"
+                  value={productUrl}
+                  onChange={handleUrlChange}
+                  placeholder={t.urlInputPlaceholder}
+                  className="w-full pl-10 pr-4 py-3 text-xs font-medium rounded-xl border border-[#CFDCE6] bg-[#FBFBFA] focus:ring-2 focus:ring-[#6B8BA4]/30 focus:border-[#6B8BA4] transition-all"
+                />
+              </div>
+
+              {/* Notifikasi Transparan Terkait Limit Enkripsi E-Commerce */}
+              <div className="p-3.5 rounded-2xl bg-[#FFF9EE] border border-[#F3DFC1] text-xs text-[#7A531C] space-y-1">
+                <div className="flex items-center gap-2 font-bold text-[#694411]">
+                  <AlertTriangle className="w-4 h-4 text-[#C9822B] shrink-0" />
+                  <span>
+                    {language === 'id' 
+                      ? 'Pemberitahuan Proteksi Enkripsi E-Commerce:' 
+                      : 'E-Commerce Encryption Notice:'}
                   </span>
                 </div>
-                <p className="text-xs font-bold text-[#24303E]">
-                  {productName || parsedData.detectedName || 'Produk E-Commerce'}
-                </p>
-                <p className="text-[11px] text-[#7A8C9E]">
-                  {price > 0 ? `Nominal: Rp ${price.toLocaleString('id-ID')}` : 'Nominal: Perlu diisi manual'} · Kategori: {categoryLabels[category]?.[language]}
+                <p className="leading-relaxed text-[#7A531C]">
+                  {language === 'id'
+                    ? 'Marketplace (Shopee, Tokopedia, TikTok Shop, dll.) menerapkan sistem proteksi anti-bot & enkripsi dinamis pada halaman mereka, sehingga nama barang atau harga diskon/varian terkadang tidak dapat dibaca 100% akurat. Mohon selalu pastikan dan sesuaikan nama barang serta nominal harga riil pada kolom di bawah.'
+                    : 'Major marketplaces use anti-bot encryption and dynamic rendering, which may prevent full automated extraction of product titles or variant prices. Please verify and adjust the product name and actual price in the fields below.'}
                 </p>
               </div>
 
-              {parsedData.cleanUrl && (
-                <a
-                  href={parsedData.cleanUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-[#D5DFE7] text-xs font-semibold text-[#485C6E] hover:bg-[#F2F6F9] hover:border-[#6B8BA4] transition-all shrink-0 cursor-pointer shadow-2xs"
-                >
-                  <span>Buka URL Produk Asli</span>
-                  <ExternalLink className="w-3.5 h-3.5 text-[#6B8BA4]" />
-                </a>
+              {/* Connected Link Preview Card */}
+              {parsedData && parsedData.platform && (
+                <div className="p-4 rounded-2xl bg-[#F8F6F2] border border-[#E2EAF0] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="px-2.5 py-0.5 rounded-md bg-[#6B8BA4] text-white text-xs font-bold uppercase tracking-wider">
+                        {parsedData.platform}
+                      </span>
+                      <span className="text-xs font-semibold text-[#47634F] flex items-center gap-1">
+                        <CheckCircle2 className="w-3.5 h-3.5" /> Tautan Terhubung
+                      </span>
+                    </div>
+                    <p className="text-xs font-bold text-[#24303E]">
+                      {productName || parsedData.detectedName || 'Produk E-Commerce'}
+                    </p>
+                    <p className="text-xs text-[#7A8C9E]">
+                      {price > 0 ? `Nominal: Rp ${price.toLocaleString('id-ID')}` : 'Nominal: Silakan isi pada kolom harga di bawah'}
+                    </p>
+                  </div>
+                  {parsedData.cleanUrl && (
+                    <a
+                      href={parsedData.cleanUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-[#D5DFE7] text-xs font-semibold text-[#485C6E] hover:bg-[#F2F6F9] hover:border-[#6B8BA4] transition-all shrink-0 cursor-pointer shadow-2xs"
+                    >
+                      <span>Buka URL Asli</span>
+                      <ExternalLink className="w-3.5 h-3.5 text-[#6B8BA4]" />
+                    </a>
+                  )}
+                </div>
               )}
             </div>
           )}
 
-          <div className="p-3.5 rounded-2xl bg-[#F0F5F8] border border-[#CFDCE6] text-[11px] text-[#3A5368] space-y-1">
-            <div className="flex items-center gap-1.5 font-bold text-[#24303E]">
-              <Info className="w-3.5 h-3.5 text-[#6B8BA4]" />
-              <span>{language === 'id' ? 'Kinerja Deteksi Link E-Commerce Dioptimalkan:' : 'Enhanced Link Parser Performance:'}</span>
-            </div>
-            <p className="leading-relaxed">
-              {language === 'id'
-                ? 'Sistem otomatis mendeteksi nama barang, kategori, serta pola harga (seperti 250k, 150rb, 1.5jt, atau parameter link). Platform e-commerce (Shopee, Tokopedia, TikTok Shop) melindungi harga real-time melalui enkripsi anti-bot dinamis. Nama barang diekstrak otomatis dan Anda dapat memastikan nominal harga riil pada kolom di bawah.'
-                : 'The system automatically detects product titles, categories, and price tokens (e.g. 250k, 150rb, 1.5m). Dynamic anti-bot encryption guards live checkout totals on marketplaces. Titles are parsed instantly and you can confirm real price values below.'}
-            </p>
-          </div>
-        </div>
-
-        {/* Step 2: Product Name & Manual Price Input */}
-        <div className="p-6 rounded-3xl bg-white border border-[#E2EAF0] shadow-xs space-y-4">
-          <div className="flex items-center gap-2">
-            <span className="w-6 h-6 rounded-full bg-[#E2EAF0] text-[#6B8BA4] font-bold text-xs flex items-center justify-center">
-              2
-            </span>
-            <h2 className="font-heading text-sm font-bold text-[#24303E]">
-              Detail Barang & Nominal Harga
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Product Name */}
-            <div>
-              <label className="block text-xs font-bold text-[#24303E] mb-1">
-                {t.productNameLabel} *
-              </label>
-              <input
-                type="text"
-                value={productName}
-                onChange={(e) => setProductName(e.target.value)}
-                placeholder={t.productNamePlaceholder}
-                className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-[#CFDCE6] bg-[#FBFBFA] focus:ring-2 focus:ring-[#6B8BA4]/30 focus:border-[#6B8BA4]"
-                required
-              />
-            </div>
-
-            {/* Bulletproof Price Input */}
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <label className="block text-xs font-bold text-[#24303E]">
-                  {t.priceLabel} *
-                </label>
-                {price > 0 && (
-                  <span className="text-[11px] font-semibold text-[#6B8BA4]">
-                    Rp {price.toLocaleString('id-ID')}
-                  </span>
-                )}
+          {/* Dynamic Alert / Status Notice for link extraction */}
+          {autoLinkedAlert && (
+            <div className="p-3.5 rounded-2xl bg-[#F4F8FA] border border-[#CFDFEB] text-xs text-[#243E56] flex items-start justify-between gap-3 animate-in fade-in">
+              <div className="flex items-start gap-2.5">
+                <Info className="w-4 h-4 text-[#6B8BA4] shrink-0 mt-0.5" />
+                <div className="leading-relaxed text-xs font-medium">{autoLinkedAlert}</div>
               </div>
-              <div className="relative">
-                <span className="absolute left-3.5 top-2.5 text-xs font-bold text-[#7A8C9E]">
-                  Rp
-                </span>
+              <button
+                type="button"
+                onClick={() => setAutoLinkedAlert(null)}
+                className="text-[#88A0B5] hover:text-[#243E56] text-xs font-bold px-1 cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+          )}
+
+          {/* Product Name & Price Fields */}
+          <div className="pt-1 space-y-4">
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Product Name Input */}
+              <div>
+                <label className="block text-xs font-bold text-[#24303E] mb-1">
+                  {t.productNameLabel} *
+                </label>
                 <input
                   type="text"
-                  inputMode="numeric"
-                  value={priceInputText}
-                  onChange={(e) => handlePriceChange(e.target.value)}
-                  placeholder="Contoh: 350.000"
-                  className="w-full pl-10 pr-3.5 py-2.5 text-xs rounded-xl border border-[#CFDCE6] bg-[#FBFBFA] focus:ring-2 focus:ring-[#6B8BA4]/30 focus:border-[#6B8BA4] font-semibold"
+                  value={productName}
+                  onChange={(e) => setProductName(e.target.value)}
+                  placeholder={language === 'id' ? 'Misal: Sepatu Sneakers Canvas, Smartwatch Pro...' : 'e.g. Retro Canvas Sneakers, Mechanical Keyboard...'}
+                  className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-[#CFDCE6] bg-[#FBFBFA] focus:ring-2 focus:ring-[#6B8BA4]/30 focus:border-[#6B8BA4]"
                   required
                 />
               </div>
 
-              {/* Quick Preset Buttons */}
-              <div className="flex items-center gap-1.5 mt-2">
-                <span className="text-[10px] text-[#7A8C9E]">Pilihan Cepat:</span>
-                {[100000, 250000, 500000, 1000000].map((amt) => (
-                  <button
-                    key={amt}
-                    type="button"
-                    onClick={() => handleSetQuickPrice(amt)}
-                    className="px-2 py-0.5 text-[10px] rounded-md bg-[#F2F6F9] hover:bg-[#E2EAF0] text-[#55697A] font-semibold transition-colors cursor-pointer"
-                  >
-                    {amt >= 1000000 ? `${amt / 1000000}jt` : `${amt / 1000}rb`}
-                  </button>
-                ))}
+              {/* Price Input */}
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-bold text-[#24303E]">
+                    {t.priceLabel} *
+                  </label>
+                  {price > 0 && (
+                    <span className="text-xs font-semibold text-[#6B8BA4]">
+                      Rp {price.toLocaleString('id-ID')}
+                    </span>
+                  )}
+                </div>
+                <div className="relative">
+                  <span className="absolute left-3.5 top-2.5 text-xs font-bold text-[#7A8C9E]">
+                    Rp
+                  </span>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={priceInputText}
+                    onChange={(e) => handlePriceChange(e.target.value)}
+                    placeholder="Contoh: 350.000"
+                    className="w-full pl-10 pr-3.5 py-2.5 text-xs rounded-xl border border-[#CFDCE6] bg-[#FBFBFA] focus:ring-2 focus:ring-[#6B8BA4]/30 focus:border-[#6B8BA4] font-semibold"
+                    required
+                  />
+                </div>
+
+                {/* Quick Preset Buttons */}
+                <div className="flex items-center gap-1.5 mt-2">
+                  <span className="text-xs text-[#7A8C9E]">Pilihan Cepat:</span>
+                  {[100000, 250000, 500000, 1000000].map((amt) => (
+                    <button
+                      key={amt}
+                      type="button"
+                      onClick={() => handleSetQuickPrice(amt)}
+                      className="px-2 py-0.5 text-xs rounded-md bg-[#F2F6F9] hover:bg-[#E2EAF0] text-[#55697A] font-semibold transition-colors cursor-pointer"
+                    >
+                      {amt >= 1000000 ? `${amt / 1000000}jt` : `${amt / 1000}rb`}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-            {/* Category */}
+            {/* Category: Empty by default */}
             <div>
               <label className="block text-xs font-bold text-[#24303E] mb-1">
-                {t.categoryLabel}
+                {t.categoryLabel} *
               </label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value as ProductCategory)}
-                className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-[#CFDCE6] bg-[#FBFBFA]"
+                className={`w-full px-3.5 py-2.5 text-xs rounded-xl border bg-[#FBFBFA] focus:ring-2 focus:ring-[#6B8BA4]/30 focus:border-[#6B8BA4] ${
+                  !category ? 'border-[#D5DFE7] text-[#8CA8BF]' : 'border-[#CFDCE6] text-[#24303E] font-medium'
+                }`}
+                required
               >
+                <option value="" disabled>
+                  {language === 'id' ? '-- Pilih Kategori Produk --' : '-- Select Product Category --'}
+                </option>
                 <option value="fashion">{categoryLabels.fashion[language]}</option>
                 <option value="gadget">{categoryLabels.gadget[language]}</option>
                 <option value="beauty">{categoryLabels.beauty[language]}</option>
@@ -546,16 +584,22 @@ export const EvaluationView: React.FC<EvaluationViewProps> = ({
               </select>
             </div>
 
-            {/* Payment Method */}
+            {/* Payment Method: Empty by default */}
             <div>
               <label className="block text-xs font-bold text-[#24303E] mb-1">
-                {t.paymentMethodLabel}
+                {t.paymentMethodLabel} *
               </label>
               <select
                 value={paymentMethod}
                 onChange={(e) => setPaymentMethod(e.target.value as PaymentMethod)}
-                className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-[#CFDCE6] bg-[#FBFBFA]"
+                className={`w-full px-3.5 py-2.5 text-xs rounded-xl border bg-[#FBFBFA] focus:ring-2 focus:ring-[#6B8BA4]/30 focus:border-[#6B8BA4] ${
+                  !paymentMethod ? 'border-[#D5DFE7] text-[#8CA8BF]' : 'border-[#CFDCE6] text-[#24303E] font-medium'
+                }`}
+                required
               >
+                <option value="" disabled>
+                  {language === 'id' ? '-- Pilih Metode Pembayaran --' : '-- Select Payment Method --'}
+                </option>
                 <option value="cash">
                   {language === 'id' ? 'Uang Tunai (Cash)' : 'Cash'}
                 </option>
@@ -566,7 +610,7 @@ export const EvaluationView: React.FC<EvaluationViewProps> = ({
                   {language === 'id' ? 'Kartu Kredit' : 'Credit Card'}
                 </option>
                 <option value="savings">
-                  {language === 'id' ? 'Tabungan (Tarik Saldo Tabungan)' : 'Savings (Withdraw from Savings)'}
+                  {language === 'id' ? 'Tabungan (Tarik Tabungan)' : 'Savings (Withdraw)'}
                 </option>
                 <option value="paylater">
                   {language === 'id' ? 'PayLater' : 'PayLater'}
@@ -584,7 +628,7 @@ export const EvaluationView: React.FC<EvaluationViewProps> = ({
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[11px] font-semibold text-[#5C6F80] mb-1">
+                  <label className="block text-xs font-semibold text-[#5C6F80] mb-1">
                     {t.paylaterTenorLabel}
                   </label>
                   <select
@@ -599,7 +643,7 @@ export const EvaluationView: React.FC<EvaluationViewProps> = ({
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[11px] font-semibold text-[#5C6F80] mb-1">
+                  <label className="block text-xs font-semibold text-[#5C6F80] mb-1">
                     {t.paylaterFeeLabel} (%)
                   </label>
                   <input
@@ -613,7 +657,7 @@ export const EvaluationView: React.FC<EvaluationViewProps> = ({
                 </div>
               </div>
               {price > 0 && (
-                <div className="text-[11px] text-[#A8486A] bg-white p-2.5 rounded-lg border border-[#F5D5E0] flex justify-between">
+                <div className="text-xs text-[#A8486A] bg-white p-2.5 rounded-lg border border-[#F5D5E0] flex justify-between">
                   <span>{t.monthlyInstallmentEst}:</span>
                   <strong>
                     Rp {Math.round((price * (1 + (paylaterFeePercent / 100) * paylaterTenorMonths)) / paylaterTenorMonths).toLocaleString('id-ID')} / bln
@@ -624,27 +668,20 @@ export const EvaluationView: React.FC<EvaluationViewProps> = ({
           )}
         </div>
 
-        {/* Step 3: Psychological & Habit Assessment (Clean / Unanswered Initially) */}
+        {/* Bagian 2: Uji Psikologi & Kebiasaan Belanja */}
         <div className="p-6 rounded-3xl bg-white border border-[#E2EAF0] shadow-xs space-y-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="w-6 h-6 rounded-full bg-[#E2EAF0] text-[#6B8BA4] font-bold text-xs flex items-center justify-center">
-                3
+                2
               </span>
-              <div>
-                <h2 className="font-heading text-sm font-bold text-[#24303E]">
-                  {language === 'id' ? 'Uji Psikologi & Kebiasaan Belanja' : 'Psychology & Habit Assessment'}
-                </h2>
-                <p className="text-[11px] text-[#7A8C9E]">
-                  {language === 'id' 
-                    ? 'Semua pertanyaan harus dijawab mandiri. Opsi "Tidak" berwarna merah soft dan "Sudah >24 jam" berwarna hijau soft.' 
-                    : 'Answer all questions. "No" is soft crimson and ">24h passed" is soft summer green.'}
-                </p>
-              </div>
+              <h2 className="font-heading text-sm font-bold text-[#24303E]">
+                {language === 'id' ? 'Uji Psikologi & Kebiasaan Belanja' : 'Psychology & Habit Assessment'}
+              </h2>
             </div>
 
             {/* Answered Counter Badge */}
-            <div className="px-3 py-1 rounded-full text-[11px] font-bold border border-[#DCE4EC] bg-[#F8F6F2] text-[#55697A]">
+            <div className="px-3 py-1 rounded-full text-xs font-bold border border-[#DCE4EC] bg-[#F8F6F2] text-[#55697A]">
               {[
                 psyNeedVsWant,
                 psyDiscountTrap,
@@ -660,10 +697,27 @@ export const EvaluationView: React.FC<EvaluationViewProps> = ({
           </div>
 
           {/* Pertanyaan 1: Kebutuhan Pokok vs Keinginan */}
-          <div className="p-4 rounded-2xl bg-[#F8F6F2] border border-[#E5ECF2] space-y-2.5">
-            <span className="text-[11px] font-bold text-[#6B8BA4] uppercase tracking-wider">
-              {language === 'id' ? 'Pertanyaan 1 · Kebutuhan vs Keinginan' : 'Question 1 · Need vs Want'}
-            </span>
+          <div className={`p-4.5 rounded-2xl transition-all duration-300 space-y-2.5 border ${
+            activeQ === 1
+              ? 'bg-[#FFFFFF] border-[#6B8BA4] ring-2 ring-[#6B8BA4]/20 shadow-md animate-pulse-glow relative'
+              : psyNeedVsWant !== null
+                ? 'bg-[#F8F6F2] border-[#DCE6ED] opacity-95'
+                : 'bg-[#FAF8F5] border-[#E8EFF5]'
+          }`}>
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-[#6B8BA4] uppercase tracking-wider flex items-center gap-1.5">
+                {activeQ === 1 && (
+                  <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#E2EAF0] text-[#527189] animate-gentle-bounce-x shrink-0 select-none shadow-2xs"><span className="text-xs">👉</span></span>
+                )}
+                <span>{language === 'id' ? 'Pertanyaan 1 · Kebutuhan vs Keinginan' : 'Question 1 · Need vs Want'}</span>
+              </span>
+              {psyNeedVsWant !== null && (
+                <span className="text-xs font-bold text-[#2D4A33] bg-[#EAF0EB] px-2 py-0.5 rounded-full flex items-center gap-1">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#3B5B41]" />
+                  <span>{language === 'id' ? 'Terjawab' : 'Answered'}</span>
+                </span>
+              )}
+            </div>
             <p className="text-xs font-bold text-[#24303E]">
               {language === 'id'
                 ? 'Apakah barang ini merupakan kebutuhan primer yang jika tidak dibeli akan mengganggu kelangsungan hidup/bekerja?'
@@ -699,10 +753,27 @@ export const EvaluationView: React.FC<EvaluationViewProps> = ({
           </div>
 
           {/* Pertanyaan 2: Jebakan Diskon / Promo */}
-          <div className="p-4 rounded-2xl bg-[#F8F6F2] border border-[#E5ECF2] space-y-2.5">
-            <span className="text-[11px] font-bold text-[#6B8BA4] uppercase tracking-wider">
-              {language === 'id' ? 'Pertanyaan 2 · Jebakan Diskon & Promo' : 'Question 2 · Discount Trap'}
-            </span>
+          <div className={`p-4.5 rounded-2xl transition-all duration-300 space-y-2.5 border ${
+            activeQ === 2
+              ? 'bg-[#FFFFFF] border-[#6B8BA4] ring-2 ring-[#6B8BA4]/20 shadow-md animate-pulse-glow relative'
+              : psyDiscountTrap !== null
+                ? 'bg-[#F8F6F2] border-[#DCE6ED] opacity-95'
+                : 'bg-[#FAF8F5] border-[#E8EFF5]'
+          }`}>
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-[#6B8BA4] uppercase tracking-wider flex items-center gap-1.5">
+                {activeQ === 2 && (
+                  <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#E2EAF0] text-[#527189] animate-gentle-bounce-x shrink-0 select-none shadow-2xs"><span className="text-xs">👉</span></span>
+                )}
+                <span>{language === 'id' ? 'Pertanyaan 2 · Jebakan Diskon & Promo' : 'Question 2 · Discount Trap'}</span>
+              </span>
+              {psyDiscountTrap !== null && (
+                <span className="text-xs font-bold text-[#2D4A33] bg-[#EAF0EB] px-2 py-0.5 rounded-full flex items-center gap-1">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#3B5B41]" />
+                  <span>{language === 'id' ? 'Terjawab' : 'Answered'}</span>
+                </span>
+              )}
+            </div>
             <p className="text-xs font-bold text-[#24303E]">
               {language === 'id'
                 ? 'Jika barang ini sedang TIDAK diskon atau dijual harga normal, apakah kamu tetap berencana membelinya?'
@@ -738,10 +809,29 @@ export const EvaluationView: React.FC<EvaluationViewProps> = ({
           </div>
 
           {/* Pertanyaan 3: Tekanan FOMO & Media Sosial */}
-          <div className="p-4 rounded-2xl bg-[#F8F6F2] border border-[#E5ECF2] space-y-2.5">
-            <span className="text-[11px] font-bold text-[#6B8BA4] uppercase tracking-wider">
-              {language === 'id' ? 'Pertanyaan 3 · Pengaruh FOMO & Tren Sosial' : 'Question 3 · FOMO & Social Trends'}
-            </span>
+          <div className={`p-4.5 rounded-2xl transition-all duration-300 space-y-2.5 border ${
+            activeQ === 3
+              ? 'bg-[#FFFFFF] border-[#6B8BA4] ring-2 ring-[#6B8BA4]/20 shadow-md animate-pulse-glow relative'
+              : psyFomoPressure !== null
+                ? 'bg-[#F8F6F2] border-[#DCE6ED] opacity-95'
+                : 'bg-[#FAF8F5] border-[#E8EFF5]'
+          }`}>
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-[#6B8BA4] uppercase tracking-wider flex items-center gap-1.5">
+                {activeQ === 3 && (
+                  <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#E2EAF0] text-[#527189] animate-gentle-bounce-x shrink-0 select-none shadow-2xs">
+                    <span className="text-xs">👉</span>
+                  </span>
+                )}
+                <span>{language === 'id' ? 'Pertanyaan 3 · Pengaruh FOMO & Tren Sosial' : 'Question 3 · FOMO & Social Trends'}</span>
+              </span>
+              {psyFomoPressure !== null && (
+                <span className="text-xs font-bold text-[#2D4A33] bg-[#EAF0EB] px-2 py-0.5 rounded-full flex items-center gap-1">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#3B5B41]" />
+                  <span>{language === 'id' ? 'Terjawab' : 'Answered'}</span>
+                </span>
+              )}
+            </div>
             <p className="text-xs font-bold text-[#24303E]">
               {language === 'id'
                 ? 'Dari mana awal mula keinginan membeli barang ini muncul?'
@@ -777,10 +867,27 @@ export const EvaluationView: React.FC<EvaluationViewProps> = ({
           </div>
 
           {/* Pertanyaan 4: Uji Menunda Pembelian (Dopamine Delay) */}
-          <div className="p-4 rounded-2xl bg-[#F8F6F2] border border-[#E5ECF2] space-y-2.5">
-            <span className="text-[11px] font-bold text-[#6B8BA4] uppercase tracking-wider">
-              {language === 'id' ? 'Pertanyaan 4 · Kesiapan Menunda (Cooling Off)' : 'Question 4 · Delay Readiness'}
-            </span>
+          <div className={`p-4.5 rounded-2xl transition-all duration-300 space-y-2.5 border ${
+            activeQ === 4
+              ? 'bg-[#FFFFFF] border-[#6B8BA4] ring-2 ring-[#6B8BA4]/20 shadow-md animate-pulse-glow relative'
+              : psyDelayReady !== null
+                ? 'bg-[#F8F6F2] border-[#DCE6ED] opacity-95'
+                : 'bg-[#FAF8F5] border-[#E8EFF5]'
+          }`}>
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-[#6B8BA4] uppercase tracking-wider flex items-center gap-1.5">
+                {activeQ === 4 && (
+                  <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#E2EAF0] text-[#527189] animate-gentle-bounce-x shrink-0 select-none shadow-2xs"><span className="text-xs">👉</span></span>
+                )}
+                <span>{language === 'id' ? 'Pertanyaan 4 · Kesiapan Menunda (Cooling Off)' : 'Question 4 · Delay Readiness'}</span>
+              </span>
+              {psyDelayReady !== null && (
+                <span className="text-xs font-bold text-[#2D4A33] bg-[#EAF0EB] px-2 py-0.5 rounded-full flex items-center gap-1">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#3B5B41]" />
+                  <span>{language === 'id' ? 'Terjawab' : 'Answered'}</span>
+                </span>
+              )}
+            </div>
             <p className="text-xs font-bold text-[#24303E]">
               {language === 'id'
                 ? 'Bisakah kamu menunda pembelian ini selama 3–7 hari tanpa merasa cemas atau rugi?'
@@ -816,10 +923,27 @@ export const EvaluationView: React.FC<EvaluationViewProps> = ({
           </div>
 
           {/* Pertanyaan 5: Emosi Pasca Pembelian (Buyer Remorse) */}
-          <div className="p-4 rounded-2xl bg-[#F8F6F2] border border-[#E5ECF2] space-y-2.5">
-            <span className="text-[11px] font-bold text-[#6B8BA4] uppercase tracking-wider">
-              {language === 'id' ? 'Pertanyaan 5 · Prediksi Emosi Pasca Checkout' : 'Question 5 · Post-Purchase Remorse'}
-            </span>
+          <div className={`p-4.5 rounded-2xl transition-all duration-300 space-y-2.5 border ${
+            activeQ === 5
+              ? 'bg-[#FFFFFF] border-[#6B8BA4] ring-2 ring-[#6B8BA4]/20 shadow-md animate-pulse-glow relative'
+              : psyPostPurchaseMood !== null
+                ? 'bg-[#F8F6F2] border-[#DCE6ED] opacity-95'
+                : 'bg-[#FAF8F5] border-[#E8EFF5]'
+          }`}>
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-[#6B8BA4] uppercase tracking-wider flex items-center gap-1.5">
+                {activeQ === 5 && (
+                  <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#E2EAF0] text-[#527189] animate-gentle-bounce-x shrink-0 select-none shadow-2xs"><span className="text-xs">👉</span></span>
+                )}
+                <span>{language === 'id' ? 'Pertanyaan 5 · Prediksi Emosi Pasca Checkout' : 'Question 5 · Post-Purchase Remorse'}</span>
+              </span>
+              {psyPostPurchaseMood !== null && (
+                <span className="text-xs font-bold text-[#2D4A33] bg-[#EAF0EB] px-2 py-0.5 rounded-full flex items-center gap-1">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#3B5B41]" />
+                  <span>{language === 'id' ? 'Terjawab' : 'Answered'}</span>
+                </span>
+              )}
+            </div>
             <p className="text-xs font-bold text-[#24303E]">
               {language === 'id'
                 ? 'Bayangkan 2 minggu setelah paket tiba: apakah kamu akan tetap senang menggunakannya atau mulai merasa menyesal uang berkurang?'
@@ -858,10 +982,19 @@ export const EvaluationView: React.FC<EvaluationViewProps> = ({
           <div className="pt-2 border-t border-[#EEF3F7] space-y-4">
             
             {/* Urgency selection */}
-            <div>
+            <div className={`p-4 rounded-2xl transition-all duration-300 border ${
+              activeQ === 6
+                ? 'bg-[#FFFFFF] border-[#6B8BA4] ring-2 ring-[#6B8BA4]/20 shadow-md animate-pulse-glow relative'
+                : urgencyScore !== null
+                  ? 'bg-[#F8F6F2] border-[#DCE6ED] opacity-95'
+                  : 'bg-[#FAF8F5] border-[#E8EFF5]'
+            }`}>
               <div className="flex items-center justify-between text-xs mb-1.5">
-                <label className="font-bold text-[#24303E]">
-                  {t.urgencyLabel} *
+                <label className="font-bold text-[#24303E] flex items-center gap-1.5">
+                  {activeQ === 6 && (
+                    <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#E2EAF0] text-[#527189] animate-gentle-bounce-x shrink-0 select-none shadow-2xs"><span className="text-xs">👉</span></span>
+                  )}
+                  <span>{t.urgencyLabel} *</span>
                 </label>
                 <span className="font-semibold text-[#6B8BA4]">
                   {urgencyScore === null && (language === 'id' ? 'Pilih tingkat urgensi (1-5)' : 'Select urgency level (1-5)')}
@@ -888,7 +1021,7 @@ export const EvaluationView: React.FC<EvaluationViewProps> = ({
                   </button>
                 ))}
               </div>
-              <div className="flex justify-between text-[10px] text-[#7A8C9E] mt-1">
+              <div className="flex justify-between text-xs text-[#7A8C9E] mt-1">
                 <span>1 ({language === 'id' ? 'Iseng / Diskon' : 'Casual / Sale'})</span>
                 <span>3 ({language === 'id' ? 'Bermanfaat' : 'Useful'})</span>
                 <span>5 ({language === 'id' ? 'Darurat / Wajib' : 'Urgent / Essential'})</span>
@@ -896,10 +1029,21 @@ export const EvaluationView: React.FC<EvaluationViewProps> = ({
             </div>
 
             {/* Has similar item toggle (Pilihan 'Tidak' = merah soft) */}
-            <div className="p-3.5 rounded-2xl bg-[#F8F6F2] border border-[#E5ECF2] flex items-center justify-between">
+            <div className={`p-4 rounded-2xl transition-all duration-300 border flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+              activeQ === 7
+                ? 'bg-[#FFFFFF] border-[#6B8BA4] ring-2 ring-[#6B8BA4]/20 shadow-md animate-pulse-glow relative'
+                : hasSimilarItem !== null
+                  ? 'bg-[#F8F6F2] border-[#DCE6ED] opacity-95'
+                  : 'bg-[#FAF8F5] border-[#E8EFF5]'
+            }`}>
               <div className="max-w-md">
-                <p className="text-xs font-bold text-[#24303E]">{t.hasSimilarLabel} *</p>
-                <p className="text-[10px] text-[#7A8C9E]">
+                <p className="text-xs font-bold text-[#24303E] flex items-center gap-1.5">
+                  {activeQ === 7 && (
+                    <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#E2EAF0] text-[#527189] animate-gentle-bounce-x shrink-0 select-none shadow-2xs"><span className="text-xs">👉</span></span>
+                  )}
+                  <span>{t.hasSimilarLabel} *</span>
+                </p>
+                <p className="text-xs text-[#7A8C9E]">
                   {language === 'id' ? 'Membeli duplikat barang yang sudah ada adalah tanda belanja impulsif.' : 'Buying duplicate items you already own is a common impulse symptom.'}
                 </p>
               </div>
@@ -930,9 +1074,18 @@ export const EvaluationView: React.FC<EvaluationViewProps> = ({
             </div>
 
             {/* Usage frequency */}
-            <div>
-              <label className="block text-xs font-bold text-[#24303E] mb-2">
-                {t.frequencyLabel} *
+            <div className={`p-4 rounded-2xl transition-all duration-300 border ${
+              activeQ === 8
+                ? 'bg-[#FFFFFF] border-[#6B8BA4] ring-2 ring-[#6B8BA4]/20 shadow-md animate-pulse-glow relative'
+                : usedFrequency !== null
+                  ? 'bg-[#F8F6F2] border-[#DCE6ED] opacity-95'
+                  : 'bg-[#FAF8F5] border-[#E8EFF5]'
+            }`}>
+              <label className="block text-xs font-bold text-[#24303E] mb-2 flex items-center gap-1.5">
+                {activeQ === 8 && (
+                  <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#E2EAF0] text-[#527189] animate-gentle-bounce-x shrink-0 select-none shadow-2xs"><span className="text-xs">👉</span></span>
+                )}
+                <span>{t.frequencyLabel} *</span>
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {[
@@ -958,10 +1111,21 @@ export const EvaluationView: React.FC<EvaluationViewProps> = ({
             </div>
 
             {/* 24h cooling off check ('Sudah lebih dari 24 jam' = hijau Soft Summer) */}
-            <div className="p-3.5 rounded-2xl bg-[#F8F6F2] border border-[#E5ECF2] flex items-center justify-between">
+            <div className={`p-4 rounded-2xl transition-all duration-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border ${
+              activeQ === 9
+                ? 'bg-[#FFFFFF] border-[#6B8BA4] ring-2 ring-[#6B8BA4]/20 shadow-md animate-pulse-glow relative'
+                : coolingOffPassed !== null
+                  ? 'bg-[#F8F6F2] border-[#DCE6ED] opacity-95'
+                  : 'bg-[#FAF8F5] border-[#E8EFF5]'
+            }`}>
               <div className="max-w-md">
-                <p className="text-xs font-bold text-[#24303E]">{t.coolingOffLabel} *</p>
-                <p className="text-[10px] text-[#7A8C9E]">
+                <div className="flex items-center gap-2">
+                  {activeQ === 9 && (
+                    <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#E2EAF0] text-[#527189] animate-gentle-bounce-x shrink-0 select-none shadow-2xs"><span className="text-xs">👉</span></span>
+                  )}
+                  <p className="text-xs font-bold text-[#24303E]">{t.coolingOffLabel} *</p>
+                </div>
+                <p className="text-xs text-[#7A8C9E]">
                   {language === 'id' ? 'Aturan 24 jam mencegah checkout akibat stimulasi emosi sesaat.' : 'The 24-hour rule cools down transient emotional spikes.'}
                 </p>
               </div>

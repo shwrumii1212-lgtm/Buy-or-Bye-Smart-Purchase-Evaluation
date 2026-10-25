@@ -30,8 +30,8 @@ export const Footer: React.FC<FooterProps> = ({
               <div className="w-8 h-8 rounded-xl bg-[#6B8BA4] flex items-center justify-center text-white">
                 <ShoppingBag className="w-4 h-4" />
               </div>
-              <span className="font-heading font-extrabold text-lg">
-                <span className="text-[#16A34A]">Buy</span> <span className="text-black font-normal">or</span> <span className="text-[#EC4899]">Bye</span>
+              <span className="font-berkshire text-2xl tracking-wide flex items-center gap-1.5 leading-none">
+                <span className="text-[#16A34A]">Buy</span> <span className="text-[#24303E] font-normal text-lg">or</span> <span className="text-[#EC4899]">Bye</span>
               </span>
             </div>
             <p className="text-[11px] text-[#7A8C9E] leading-relaxed">

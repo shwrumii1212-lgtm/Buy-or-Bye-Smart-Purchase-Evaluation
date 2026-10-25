@@ -156,7 +156,7 @@ export const FinancialDashboardView: React.FC<FinancialDashboardViewProps> = ({
             <Wallet className="w-3.5 h-3.5 text-[#6B8BA4]" />
             <span>Pondasi Finansial Pengguna</span>
           </div>
-          <h1 className="font-heading text-2xl sm:text-3xl font-extrabold text-[#24303E]">
+          <h1 className="font-berkshire text-2xl sm:text-3xl font-extrabold text-[#24303E]">
             {t.financeTitle}
           </h1>
           <p className="text-xs sm:text-sm text-[#5C6F80] mt-1 max-w-xl">
@@ -203,7 +203,7 @@ export const FinancialDashboardView: React.FC<FinancialDashboardViewProps> = ({
           <p className="text-2xl font-heading font-black text-[#24303E]">
             Rp {totalMonthlyExpenses.toLocaleString('id-ID')}
           </p>
-          <p className="text-[11px] text-[#5C6F80] font-medium mt-1">
+          <p className="text-xs text-[#5C6F80] font-medium mt-1">
             {currentIncome > 0 ? `${Math.round((totalMonthlyExpenses / currentIncome) * 100)}% dari pemasukan` : 'Pokok + Lifestyle + Cicilan + Tabungan'}
           </p>
         </div>
@@ -217,10 +217,12 @@ export const FinancialDashboardView: React.FC<FinancialDashboardViewProps> = ({
             </div>
           </div>
           <p className="text-2xl font-heading font-black text-[#24303E]">
-            Rp {discretionaryCash.toLocaleString('id-ID')}
+            {inlineIncome > 0 ? `Rp ${discretionaryCash.toLocaleString('id-ID')}` : '-'}
           </p>
-          <p className="text-[11px] text-[#7E9383] font-medium mt-1">
-            {language === 'id' ? 'Sisa kas bebas untuk evaluasi belanja' : 'Free cash available for shopping'}
+          <p className="text-xs text-[#7E9383] font-medium mt-1">
+            {inlineIncome > 0 
+              ? (language === 'id' ? 'Sisa kas bebas untuk evaluasi belanja' : 'Free cash available for shopping')
+              : (language === 'id' ? 'Isi profil keuangan di bawah' : 'Set up financial profile below')}
           </p>
         </div>
 
@@ -235,7 +237,7 @@ export const FinancialDashboardView: React.FC<FinancialDashboardViewProps> = ({
           <p className="text-2xl font-heading font-black text-[#24303E]">
             {inlineIncome > 0 ? `${dsr}%` : '0%'}
           </p>
-          <p className="text-[11px] text-[#7A8C9E] mt-1">
+          <p className="text-xs text-[#7A8C9E] mt-1">
             {inlineIncome > 0 ? (dsr <= 30 ? 'Aman (Maks 30%) ✓' : 'Peringatan: Melebihi 30% ⚠️') : 'Isi pemasukan di bawah'}
           </p>
         </div>
@@ -251,7 +253,7 @@ export const FinancialDashboardView: React.FC<FinancialDashboardViewProps> = ({
           <p className="text-2xl font-heading font-black text-[#24303E]">
             {inlineEssentials > 0 ? emergencyMonthsCurrent : 0} <span className="text-sm font-normal text-[#7A8C9E]">Bulan</span>
           </p>
-          <p className="text-[11px] text-[#9B8EA9] font-medium mt-1">
+          <p className="text-xs text-[#9B8EA9] font-medium mt-1">
             Target: {inlineTargetMonths} bulan pengeluaran
           </p>
         </div>
@@ -270,9 +272,6 @@ export const FinancialDashboardView: React.FC<FinancialDashboardViewProps> = ({
                 Input & Perbarui Data Keuangan Manual
               </h2>
             </div>
-            <p className="text-xs text-[#5C6F80] mt-1">
-              Ubah angka-angka di bawah ini secara manual kapan saja. Hasil perhitungan akan langsung menyesuaikan secara real-time.
-            </p>
           </div>
 
           {saveSuccess && (
@@ -309,7 +308,7 @@ export const FinancialDashboardView: React.FC<FinancialDashboardViewProps> = ({
                 required
               />
             </div>
-            <p className="text-[11px] text-[#7A8C9E] mt-1">Total gaji bersih, honor, atau pemasukan bulanan rutin.</p>
+            <p className="text-xs text-[#7A8C9E] mt-1">Total gaji bersih, honor, atau pemasukan bulanan rutin.</p>
           </div>
 
           {/* 4 Expense Buckets Inputs */}
@@ -322,7 +321,7 @@ export const FinancialDashboardView: React.FC<FinancialDashboardViewProps> = ({
                   <span className="w-2.5 h-2.5 rounded-full bg-[#6B8BA4]" />
                   {t.essentialExpenses}
                 </label>
-                <span className="text-[11px] font-bold text-[#6B8BA4]">
+                <span className="text-xs font-bold text-[#6B8BA4]">
                   Rp {inlineEssentials.toLocaleString('id-ID')}
                 </span>
               </div>
@@ -339,7 +338,7 @@ export const FinancialDashboardView: React.FC<FinancialDashboardViewProps> = ({
                   className="w-full pl-9 pr-3 py-2 text-xs font-semibold rounded-lg border border-[#CFDCE6] bg-white focus:ring-2 focus:ring-[#6B8BA4]/30"
                 />
               </div>
-              <p className="text-[10px] text-[#7A8C9E]">{t.essentialDesc}</p>
+              <p className="text-xs text-[#7A8C9E]">{t.essentialDesc}</p>
             </div>
 
             {/* Pos 2: Lifestyle / Wants */}
@@ -349,7 +348,7 @@ export const FinancialDashboardView: React.FC<FinancialDashboardViewProps> = ({
                   <span className="w-2.5 h-2.5 rounded-full bg-[#D8A4B8]" />
                   {t.lifestyleExpenses}
                 </label>
-                <span className="text-[11px] font-bold text-[#D8A4B8]">
+                <span className="text-xs font-bold text-[#D8A4B8]">
                   Rp {inlineLifestyle.toLocaleString('id-ID')}
                 </span>
               </div>
@@ -366,7 +365,7 @@ export const FinancialDashboardView: React.FC<FinancialDashboardViewProps> = ({
                   className="w-full pl-9 pr-3 py-2 text-xs font-semibold rounded-lg border border-[#CFDCE6] bg-white focus:ring-2 focus:ring-[#6B8BA4]/30"
                 />
               </div>
-              <p className="text-[10px] text-[#7A8C9E]">{t.lifestyleDesc}</p>
+              <p className="text-xs text-[#7A8C9E]">{t.lifestyleDesc}</p>
             </div>
 
             {/* Pos 3: Cicilan & Kewajiban */}
@@ -376,7 +375,7 @@ export const FinancialDashboardView: React.FC<FinancialDashboardViewProps> = ({
                   <span className="w-2.5 h-2.5 rounded-full bg-[#9B8EA9]" />
                   {t.debtInstallments}
                 </label>
-                <span className="text-[11px] font-bold text-[#9B8EA9]">
+                <span className="text-xs font-bold text-[#9B8EA9]">
                   Rp {inlineDebts.toLocaleString('id-ID')}
                 </span>
               </div>
@@ -393,7 +392,7 @@ export const FinancialDashboardView: React.FC<FinancialDashboardViewProps> = ({
                   className="w-full pl-9 pr-3 py-2 text-xs font-semibold rounded-lg border border-[#CFDCE6] bg-white focus:ring-2 focus:ring-[#6B8BA4]/30"
                 />
               </div>
-              <p className="text-[10px] text-[#7A8C9E]">{t.debtDesc}</p>
+              <p className="text-xs text-[#7A8C9E]">{t.debtDesc}</p>
             </div>
 
             {/* Pos 4: Tabungan Rutin */}
@@ -403,7 +402,7 @@ export const FinancialDashboardView: React.FC<FinancialDashboardViewProps> = ({
                   <span className="w-2.5 h-2.5 rounded-full bg-[#9EAEA2]" />
                   {t.savingsRoutinary}
                 </label>
-                <span className="text-[11px] font-bold text-[#7E9383]">
+                <span className="text-xs font-bold text-[#7E9383]">
                   Rp {inlineSavings.toLocaleString('id-ID')}
                 </span>
               </div>
@@ -420,7 +419,7 @@ export const FinancialDashboardView: React.FC<FinancialDashboardViewProps> = ({
                   className="w-full pl-9 pr-3 py-2 text-xs font-semibold rounded-lg border border-[#CFDCE6] bg-white focus:ring-2 focus:ring-[#6B8BA4]/30"
                 />
               </div>
-              <p className="text-[10px] text-[#7A8C9E]">{t.savingsDesc}</p>
+              <p className="text-xs text-[#7A8C9E]">{t.savingsDesc}</p>
             </div>
 
           </div>
@@ -548,7 +547,7 @@ export const FinancialDashboardView: React.FC<FinancialDashboardViewProps> = ({
               className="bg-[#9EAEA2] h-full rounded-full transition-all"
             />
           </div>
-          <p className="text-[11px] text-[#7A8C9E]">
+          <p className="text-xs text-[#7A8C9E]">
             {inlineEmergency >= emergencyTargetAmount 
               ? 'Selamat! Target dana daruratmu sudah tercapai 100%.' 
               : `Masih membutuhkan Rp ${Math.max(0, emergencyTargetAmount - inlineEmergency).toLocaleString('id-ID')} untuk mencapai benteng keamanan ideal.`}
@@ -599,27 +598,29 @@ export const FinancialDashboardView: React.FC<FinancialDashboardViewProps> = ({
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
           <div className="p-4 rounded-2xl bg-[#F8F6F2] border border-[#E5ECF2]">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-[#7A8C9E]">Total Uang Bebas Tersisa</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-[#7A8C9E]">Total Uang Bebas Tersisa</p>
             <p className="text-xl font-heading font-extrabold text-[#24303E] mt-1">
-              Rp {discretionaryCash.toLocaleString('id-ID')}
+              {inlineIncome > 0 ? `Rp ${discretionaryCash.toLocaleString('id-ID')}` : '-'}
             </p>
-            <p className="text-[10px] text-[#7E9383] mt-0.5">Setelah kebutuhan pokok, cicilan, dan tabungan</p>
+            <p className="text-xs text-[#7E9383] mt-0.5">
+              {inlineIncome > 0 ? 'Setelah kebutuhan pokok, cicilan, dan tabungan' : 'Belum diisi'}
+            </p>
           </div>
 
           <div className="p-4 rounded-2xl bg-[#F8F6F2] border border-[#E5ECF2]">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-[#7A8C9E]">Uang Terselamatkan dari BYE</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-[#7A8C9E]">Uang Terselamatkan dari BYE</p>
             <p className="text-xl font-heading font-extrabold text-[#7E9383] mt-1">
               Rp {shoppingItems.filter(i => i.status === 'saved_bye').reduce((acc, c) => acc + (c.savedAmount || c.price), 0).toLocaleString('id-ID')}
             </p>
-            <p className="text-[10px] text-[#7A8C9E] mt-0.5">Terlindungi dari belanja impulsif bulan ini</p>
+            <p className="text-xs text-[#7A8C9E] mt-0.5">Terlindungi dari belanja impulsif bulan ini</p>
           </div>
 
           <div className="p-4 rounded-2xl bg-[#F8F6F2] border border-[#E5ECF2]">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-[#7A8C9E]">Total Belanja Disetujui</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-[#7A8C9E]">Total Belanja Disetujui</p>
             <p className="text-xl font-heading font-extrabold text-[#D8A4B8] mt-1">
               Rp {shoppingItems.filter(i => i.status === 'bought').reduce((acc, c) => acc + c.price, 0).toLocaleString('id-ID')}
             </p>
-            <p className="text-[10px] text-[#7A8C9E] mt-0.5">Sesuai pertimbangan rule-based yang aman</p>
+            <p className="text-xs text-[#7A8C9E] mt-0.5">Sesuai pertimbangan rule-based yang aman</p>
           </div>
         </div>
       </section>

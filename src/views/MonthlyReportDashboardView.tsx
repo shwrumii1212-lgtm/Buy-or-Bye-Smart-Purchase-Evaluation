@@ -232,7 +232,7 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
             </span>
           </div>
 
-          <h1 className="font-heading text-2xl sm:text-3xl font-extrabold text-[#24303E] tracking-tight">
+          <h1 className="font-berkshire text-2xl sm:text-3xl font-extrabold text-[#24303E] tracking-tight">
             {language === 'id' ? 'Dashboard Laporan Bulanan' : 'Monthly Financial Report'}
           </h1>
           <p className="text-xs sm:text-sm text-[#5C6F80] max-w-2xl leading-relaxed">
@@ -306,7 +306,7 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
           <div className="text-lg sm:text-xl font-heading font-extrabold text-[#24303E]">
             Rp {income.toLocaleString('id-ID')}
           </div>
-          <p className="text-[11px] text-[#7A8C9E]">
+          <p className="text-xs text-[#7A8C9E]">
             {language === 'id' ? 'Take Home Pay bulanan' : 'Monthly verified base'}
           </p>
         </div>
@@ -322,7 +322,7 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
           <div className="text-lg sm:text-xl font-heading font-extrabold text-[#24303E]">
             Rp {totalCommitted.toLocaleString('id-ID')}
           </div>
-          <div className="flex items-center gap-1.5 text-[11px]">
+          <div className="flex items-center gap-1.5 text-xs">
             <span className="font-semibold text-[#5C6F80]">
               {Math.round((totalCommitted / income) * 100)}%
             </span>
@@ -349,7 +349,7 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
           }`}>
             {isDeficit ? `- Rp ${deficitAmount.toLocaleString('id-ID')}` : `Rp ${discretionaryCash.toLocaleString('id-ID')}`}
           </div>
-          <p className="text-[11px] text-[#5C6F80]">
+          <p className="text-xs text-[#5C6F80]">
             {isDeficit 
               ? (language === 'id' ? 'Defisit! Kurangi pengeluaran' : 'Deficit! Reduce spending')
               : `${freeCashPercent}% ${language === 'id' ? 'dana likuid fleksibel' : 'liquid free cash'}`}
@@ -369,7 +369,7 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
           }`}>
             {dsr}%
           </div>
-          <div className="flex items-center gap-1.5 text-[11px]">
+          <div className="flex items-center gap-1.5 text-xs">
             <span className={`w-2 h-2 rounded-full ${
               dsr > 30 ? 'bg-[#D8A4B8]' : dsr > 20 ? 'bg-[#E5D7A3]' : 'bg-[#9EAEA2]'
             }`} />
@@ -394,7 +394,7 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
           <div className="text-lg sm:text-xl font-heading font-extrabold text-[#6B8BA4]">
             Rp {totalSavedByeAmount.toLocaleString('id-ID')}
           </div>
-          <p className="text-[11px] text-[#7A8C9E]">
+          <p className="text-xs text-[#7A8C9E]">
             {language === 'id' 
               ? `${totalByeItems.length} keputusan BYE sukses` 
               : `${totalByeItems.length} successful BYE decisions`}
@@ -408,13 +408,13 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
         <div className="flex items-center gap-4">
           <div className="relative w-16 h-16 rounded-2xl bg-[#24303E] text-white flex items-center justify-center font-heading font-extrabold text-2xl shadow-md shrink-0">
             {healthScore}
-            <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-[#9EAEA2] border-2 border-white flex items-center justify-center text-[10px] text-white font-bold">
+            <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-[#9EAEA2] border-2 border-white flex items-center justify-center text-xs text-white font-bold">
               ✓
             </span>
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold ${healthGrade.badgeColor}`}>
+              <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${healthGrade.badgeColor}`}>
                 {healthGrade.title}
               </span>
               <span className="text-xs text-[#7A8C9E] font-medium">
@@ -460,7 +460,7 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
         <div className="p-6 sm:p-7 rounded-3xl bg-white border border-[#E2EAF0] shadow-sm space-y-6">
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <span className="text-[11px] font-bold text-[#6B8BA4] uppercase tracking-wider">
+              <span className="text-xs font-bold text-[#6B8BA4] uppercase tracking-wider">
                 {language === 'id' ? 'Grafik Visual 1' : 'Visual Chart 1'}
               </span>
               <h3 className="font-heading text-lg font-bold text-[#24303E] flex items-center gap-2">
@@ -546,7 +546,7 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
               
               {/* Inner Center Label */}
               <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-2">
-                <span className="text-[10px] text-[#7A8C9E] font-medium leading-none">
+                <span className="text-xs text-[#7A8C9E] font-medium leading-none">
                   {language === 'id' ? 'Sisa Bebas' : 'Free Cash'}
                 </span>
                 <span className="font-heading font-extrabold text-sm text-[#24303E] mt-1">
@@ -569,7 +569,7 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
                 </div>
                 <div className="text-right">
                   <span className="font-bold text-[#24303E]">{essentialsPercent}%</span>
-                  <span className="text-[10px] text-[#7A8C9E] block">Rp {essentials.toLocaleString('id-ID')}</span>
+                  <span className="text-xs text-[#7A8C9E] block">Rp {essentials.toLocaleString('id-ID')}</span>
                 </div>
               </div>
 
@@ -582,7 +582,7 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
                 </div>
                 <div className="text-right">
                   <span className="font-bold text-[#24303E]">{lifestylePercent}%</span>
-                  <span className="text-[10px] text-[#7A8C9E] block">Rp {lifestyle.toLocaleString('id-ID')}</span>
+                  <span className="text-xs text-[#7A8C9E] block">Rp {lifestyle.toLocaleString('id-ID')}</span>
                 </div>
               </div>
 
@@ -595,7 +595,7 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
                 </div>
                 <div className="text-right">
                   <span className="font-bold text-[#24303E]">{debtsPercent}%</span>
-                  <span className="text-[10px] text-[#7A8C9E] block">Rp {debts.toLocaleString('id-ID')}</span>
+                  <span className="text-xs text-[#7A8C9E] block">Rp {debts.toLocaleString('id-ID')}</span>
                 </div>
               </div>
 
@@ -608,7 +608,7 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
                 </div>
                 <div className="text-right">
                   <span className="font-bold text-[#24303E]">{savingsPercent}%</span>
-                  <span className="text-[10px] text-[#7A8C9E] block">Rp {savings.toLocaleString('id-ID')}</span>
+                  <span className="text-xs text-[#7A8C9E] block">Rp {savings.toLocaleString('id-ID')}</span>
                 </div>
               </div>
             </div>
@@ -628,7 +628,7 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
         <div className="p-6 sm:p-7 rounded-3xl bg-white border border-[#E2EAF0] shadow-sm space-y-6">
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <span className="text-[11px] font-bold text-[#6B8BA4] uppercase tracking-wider">
+              <span className="text-xs font-bold text-[#6B8BA4] uppercase tracking-wider">
                 {language === 'id' ? 'Grafik Visual 2' : 'Visual Chart 2'}
               </span>
               <h3 className="font-heading text-lg font-bold text-[#24303E] flex items-center gap-2">
@@ -660,7 +660,7 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
                   style={{ width: `${Math.min(100, essentialsPercent)}%` }}
                 />
               </div>
-              <div className="flex justify-between text-[10px] text-[#7A8C9E]">
+              <div className="flex justify-between text-xs text-[#7A8C9E]">
                 <span>Rp {essentials.toLocaleString('id-ID')}</span>
                 <span>Batas target 50%: Rp {(income * 0.5).toLocaleString('id-ID')}</span>
               </div>
@@ -682,7 +682,7 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
                   style={{ width: `${Math.min(100, lifestylePercent)}%` }}
                 />
               </div>
-              <div className="flex justify-between text-[10px] text-[#7A8C9E]">
+              <div className="flex justify-between text-xs text-[#7A8C9E]">
                 <span>Rp {lifestyle.toLocaleString('id-ID')}</span>
                 <span>Batas target 30%: Rp {(income * 0.3).toLocaleString('id-ID')}</span>
               </div>
@@ -704,7 +704,7 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
                   style={{ width: `${Math.min(100, savingsPercent + debtsPercent)}%` }}
                 />
               </div>
-              <div className="flex justify-between text-[10px] text-[#7A8C9E]">
+              <div className="flex justify-between text-xs text-[#7A8C9E]">
                 <span>Tabungan Rp {savings.toLocaleString('id-ID')} + Cicilan Rp {debts.toLocaleString('id-ID')}</span>
                 <span>Target 20%: Rp {(income * 0.2).toLocaleString('id-ID')}</span>
               </div>
@@ -736,7 +736,7 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
         <div className="p-6 sm:p-7 rounded-3xl bg-white border border-[#E2EAF0] shadow-sm space-y-5">
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <span className="text-[11px] font-bold text-[#6B8BA4] uppercase tracking-wider">
+              <span className="text-xs font-bold text-[#6B8BA4] uppercase tracking-wider">
                 {language === 'id' ? 'Grafik Visual 3' : 'Visual Chart 3'}
               </span>
               <h3 className="font-heading text-lg font-bold text-[#24303E] flex items-center gap-2">
@@ -771,7 +771,7 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
                       {categoryLabels[catKey]?.[language] || catKey}
                     </span>
                     <div className="flex items-center gap-2">
-                      <span className="text-[11px] text-[#7A8C9E] font-medium">{percentOfBought}%</span>
+                      <span className="text-xs text-[#7A8C9E] font-medium">{percentOfBought}%</span>
                       <span className="font-semibold text-[#24303E]">
                         Rp {amount.toLocaleString('id-ID')}
                       </span>
@@ -794,7 +794,7 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
             })}
           </div>
 
-          <div className="text-[11px] text-[#7A8C9E] pt-2 border-t border-[#EEF3F7] flex items-center justify-between">
+          <div className="text-xs text-[#7A8C9E] pt-2 border-t border-[#EEF3F7] flex items-center justify-between">
             <span>{language === 'id' ? 'Total item dibeli bulan ini:' : 'Total items bought this month:'} {totalBoughtItems.length} item</span>
             <button
               onClick={() => onNavigate('history')}
@@ -809,7 +809,7 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
         <div className="p-6 sm:p-7 rounded-3xl bg-white border border-[#E2EAF0] shadow-sm space-y-6">
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <span className="text-[11px] font-bold text-[#6B8BA4] uppercase tracking-wider">
+              <span className="text-xs font-bold text-[#6B8BA4] uppercase tracking-wider">
                 {language === 'id' ? 'Grafik Visual 4' : 'Visual Chart 4'}
               </span>
               <h3 className="font-heading text-lg font-bold text-[#24303E] flex items-center gap-2">
@@ -829,7 +829,7 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
                 <span className="text-xs font-bold text-[#24303E]">
                   {language === 'id' ? 'Ketahanan Dana Darurat' : 'Emergency Fund Runway'}
                 </span>
-                <span className="text-[11px] text-[#5C6F80] block">
+                <span className="text-xs text-[#5C6F80] block">
                   {emergencyMonthsCurrent} {language === 'id' ? 'bulan dari target' : 'months of'} {targetMonths} {language === 'id' ? 'bulan' : 'months'}
                 </span>
               </div>
@@ -851,7 +851,7 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
               />
             </div>
 
-            <div className="flex items-center justify-between text-[11px] text-[#7A8C9E]">
+            <div className="flex items-center justify-between text-xs text-[#7A8C9E]">
               <span>Rp {emergencyFund.toLocaleString('id-ID')}</span>
               <span>Target: Rp {emergencyTargetAmount.toLocaleString('id-ID')}</span>
             </div>
@@ -868,7 +868,7 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
                 <span className="font-heading font-extrabold text-lg text-[#065F46]">
                   {totalBoughtItems.length}
                 </span>
-                <span className="text-[10px] text-[#047857] block font-medium">
+                <span className="text-xs text-[#047857] block font-medium">
                   {language === 'id' ? 'Layak Dibeli' : 'Approved'}
                 </span>
               </div>
@@ -878,7 +878,7 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
                 <span className="font-heading font-extrabold text-lg text-[#9F1239]">
                   {totalByeItems.length}
                 </span>
-                <span className="text-[10px] text-[#BE123C] block font-medium">
+                <span className="text-xs text-[#BE123C] block font-medium">
                   {language === 'id' ? 'Ditolak / Hemat' : 'Skipped / Saved'}
                 </span>
               </div>
@@ -888,7 +888,7 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
                 <span className="font-heading font-extrabold text-lg text-[#3730A3]">
                   {totalCoolingItems.length}
                 </span>
-                <span className="text-[10px] text-[#4F46E5] block font-medium">
+                <span className="text-xs text-[#4F46E5] block font-medium">
                   {language === 'id' ? 'Tahan 24-48 Jam' : 'Paused 24-48h'}
                 </span>
               </div>
@@ -949,7 +949,7 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
                     ? `Pos lifestyle kamu berada di ${lifestylePercent}%, sangat proporsional! Pertahankan disiplin ini dengan selalu menyisihkan tabungan di awal gajian (Pay Yourself First).` 
                     : `Your lifestyle spending sits at a healthy ${lifestylePercent}%. Maintain this discipline by applying the Pay Yourself First principle at month-start.`)}
             </p>
-            <div className="pt-2 text-[11px] font-semibold text-[#6B8BA4] flex items-center gap-1">
+            <div className="pt-2 text-xs font-semibold text-[#6B8BA4] flex items-center gap-1">
               <span>{language === 'id' ? 'Rekomendasi Tindakan' : 'Action Target'}:</span>
               <span className="text-[#24303E]">
                 {lifestylePercent > 30 
@@ -976,7 +976,7 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
                     ? `Beban cicilanmu (${dsr}%) berada di zona aman. Jika hendak membeli barang bernilai tinggi, prioritaskan sinking fund (tabungan terencana) daripada tenor paylater berbunga.` 
                     : `Your installment load (${dsr}%) is safe. For future high-ticket items, prioritize sinking funds over interest-bearing buy-now-pay-later plans.`)}
             </p>
-            <div className="pt-2 text-[11px] font-semibold text-[#6B8BA4] flex items-center gap-1">
+            <div className="pt-2 text-xs font-semibold text-[#6B8BA4] flex items-center gap-1">
               <span>{language === 'id' ? 'Ambang Batas Sehat' : 'Safe Benchmark'}:</span>
               <span className="text-[#24303E]">Maksimal 20-30%</span>
             </div>
@@ -999,7 +999,7 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
                     ? `Bagus! Ketahanan dana daruratmu mencapai ${emergencyMonthsCurrent} bulan. Kamu memiliki kebebasan finansial dan keamanan psikologis yang kuat saat menghadapi kejadian mendadak.` 
                     : `Excellent! Your emergency runway covers ${emergencyMonthsCurrent} months. You possess strong financial security against unexpected life events.`)}
             </p>
-            <div className="pt-2 text-[11px] font-semibold text-[#6B8BA4] flex items-center gap-1">
+            <div className="pt-2 text-xs font-semibold text-[#6B8BA4] flex items-center gap-1">
               <span>{language === 'id' ? 'Target Minimal' : 'Target Buffer'}:</span>
               <span className="text-[#24303E]">3 - 6 {language === 'id' ? 'bulan pengeluaran' : 'months expenses'}</span>
             </div>
@@ -1011,7 +1011,7 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
         <div className="p-6 rounded-2xl bg-gradient-to-r from-[#F8F6F2] via-white to-[#F8F6F2] border border-[#E2EAF0] space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="space-y-1">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-[#6B8BA4]/15 text-[#587893] text-[11px] font-bold">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-[#6B8BA4]/15 text-[#587893] text-xs font-bold">
                 <Sliders className="w-3.5 h-3.5" />
                 {language === 'id' ? 'Simulator Skenario Hemat' : 'What-If Savings Simulator'}
               </span>
@@ -1042,7 +1042,7 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
             <div className="p-3.5 rounded-xl bg-white border border-[#E2EAF0]">
-              <span className="text-[11px] text-[#7A8C9E] font-medium block">
+              <span className="text-xs text-[#7A8C9E] font-medium block">
                 {language === 'id' ? 'Penghematan Ekstra / Bulan' : 'Extra Monthly Savings'}
               </span>
               <span className="font-heading font-extrabold text-base text-[#396348]">
@@ -1051,7 +1051,7 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
             </div>
 
             <div className="p-3.5 rounded-xl bg-white border border-[#E2EAF0]">
-              <span className="text-[11px] text-[#7A8C9E] font-medium block">
+              <span className="text-xs text-[#7A8C9E] font-medium block">
                 {language === 'id' ? 'Tambahan Dana / Tahun' : 'Annual Accumulated Surplus'}
               </span>
               <span className="font-heading font-extrabold text-base text-[#6B8BA4]">
@@ -1060,7 +1060,7 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
             </div>
 
             <div className="p-3.5 rounded-xl bg-white border border-[#E2EAF0]">
-              <span className="text-[11px] text-[#7A8C9E] font-medium block">
+              <span className="text-xs text-[#7A8C9E] font-medium block">
                 {language === 'id' ? 'Percepatan Runway Darurat' : 'Extra Runway Acceleration'}
               </span>
               <span className="font-heading font-extrabold text-base text-[#9EAEA2]">
@@ -1077,7 +1077,7 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
               <CheckCircle2 className="w-4 h-4 text-[#9EAEA2]" />
               {language === 'id' ? 'Checklist Rencana Tindakan Bulan Ini' : 'This Month Action Plan Checklist'}
             </h3>
-            <span className="text-[11px] text-[#7A8C9E]">
+            <span className="text-xs text-[#7A8C9E]">
               {Object.values(actionChecks).filter(Boolean).length}/4 {language === 'id' ? 'Tercapai' : 'Done'}
             </span>
           </div>
@@ -1125,7 +1125,7 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
                     <h4 className={`text-xs font-bold ${checked ? 'text-[#24303E]' : 'text-[#5C6F80]'}`}>
                       {item.title}
                     </h4>
-                    <p className="text-[11px] text-[#7A8C9E] mt-0.5 leading-relaxed">
+                    <p className="text-xs text-[#7A8C9E] mt-0.5 leading-relaxed">
                       {item.desc}
                     </p>
                   </div>
@@ -1176,7 +1176,7 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
                   </td>
                   <td className="py-3 text-right text-[#7A8C9E]">100%</td>
                   <td className="py-3 text-right">
-                    <span className="px-2 py-0.5 rounded-full bg-[#E2EAF0] text-[#506A80] text-[10px] font-bold">
+                    <span className="px-2 py-0.5 rounded-full bg-[#E2EAF0] text-[#506A80] text-xs font-bold">
                       Base
                     </span>
                   </td>
@@ -1191,7 +1191,7 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
                   </td>
                   <td className="py-3 text-right text-[#7A8C9E]">{essentialsPercent}%</td>
                   <td className="py-3 text-right">
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
                       essentialsPercent <= 50 ? 'bg-[#9EAEA2]/20 text-[#396348]' : 'bg-[#D8A4B8]/30 text-[#8A3A5A]'
                     }`}>
                       {essentialsPercent <= 50 ? 'Ideal (≤50%)' : 'Melebihi (>50%)'}
@@ -1208,7 +1208,7 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
                   </td>
                   <td className="py-3 text-right text-[#7A8C9E]">{lifestylePercent}%</td>
                   <td className="py-3 text-right">
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
                       lifestylePercent <= 30 ? 'bg-[#9EAEA2]/20 text-[#396348]' : 'bg-[#D8A4B8]/30 text-[#8A3A5A]'
                     }`}>
                       {lifestylePercent <= 30 ? 'Ideal (≤30%)' : 'Waspada (>30%)'}
@@ -1225,7 +1225,7 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
                   </td>
                   <td className="py-3 text-right text-[#7A8C9E]">{debtsPercent}%</td>
                   <td className="py-3 text-right">
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
                       debtsPercent <= 20 ? 'bg-[#9EAEA2]/20 text-[#396348]' : debtsPercent <= 30 ? 'bg-[#E5D7A3]/30 text-[#826E2B]' : 'bg-[#D8A4B8]/30 text-[#8A3A5A]'
                     }`}>
                       {debtsPercent <= 20 ? 'Aman (≤20%)' : debtsPercent <= 30 ? 'Perhatian' : 'Bahaya (>30%)'}
@@ -1242,7 +1242,7 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
                   </td>
                   <td className="py-3 text-right text-[#7A8C9E]">{savingsPercent}%</td>
                   <td className="py-3 text-right">
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
                       savingsPercent >= 10 ? 'bg-[#9EAEA2]/20 text-[#396348]' : 'bg-[#E5D7A3]/30 text-[#826E2B]'
                     }`}>
                       {savingsPercent >= 10 ? 'Bagus (≥10%)' : 'Tingkatkan'}
@@ -1259,7 +1259,7 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
                   </td>
                   <td className="py-3 text-right text-[#7A8C9E]">{freeCashPercent}%</td>
                   <td className="py-3 text-right">
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
                       !isDeficit ? 'bg-[#9EAEA2]/20 text-[#396348]' : 'bg-[#D8A4B8]/30 text-[#8A3A5A]'
                     }`}>
                       {!isDeficit ? 'Surplus' : 'Defisit'}
@@ -1271,7 +1271,7 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
             </table>
           </div>
 
-          <div className="pt-2 flex items-center justify-between text-[11px] text-[#7A8C9E]">
+          <div className="pt-2 flex items-center justify-between text-xs text-[#7A8C9E]">
             <span>
               {language === 'id' ? 'Dana Darurat Tersimpan:' : 'Accumulated Emergency Fund:'}{' '}
               <strong className="text-[#24303E]">Rp {emergencyFund.toLocaleString('id-ID')}</strong> ({emergencyMonthsCurrent} bulan)
@@ -1317,7 +1317,7 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
                     <p className="font-bold text-[#24303E] truncate">
                       {it.productName}
                     </p>
-                    <p className="text-[10px] text-[#7A8C9E]">
+                    <p className="text-xs text-[#7A8C9E]">
                       {categoryLabels[it.category]?.[language] || it.category} · {it.paymentMethod.toUpperCase()}
                     </p>
                   </div>
@@ -1325,7 +1325,7 @@ export const MonthlyReportDashboardView: React.FC<MonthlyReportDashboardViewProp
                     <span className="font-bold text-[#24303E] block">
                       Rp {it.price.toLocaleString('id-ID')}
                     </span>
-                    <span className={`text-[10px] font-bold ${
+                    <span className={`text-xs font-bold ${
                       it.status === 'bought' ? 'text-[#396348]' : it.status === 'saved_bye' ? 'text-[#8A3A5A]' : 'text-[#5F4E73]'
                     }`}>
                       {it.status === 'bought' ? 'DIBELI' : it.status === 'saved_bye' ? 'BYE (HEMAT)' : 'TUNDA'}

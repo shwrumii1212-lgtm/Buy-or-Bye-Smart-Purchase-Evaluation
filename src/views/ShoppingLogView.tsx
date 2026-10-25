@@ -144,7 +144,7 @@ export const ShoppingLogView: React.FC<ShoppingLogViewProps> = ({
             <History className="w-3.5 h-3.5 text-[#6B8BA4]" />
             <span>Shopping Pattern Tracker</span>
           </div>
-          <h1 className="font-heading text-2xl sm:text-3xl font-extrabold text-[#24303E]">
+          <h1 className="font-berkshire text-2xl sm:text-3xl font-extrabold text-[#24303E]">
             {t.historyTitle}
           </h1>
           <p className="text-xs sm:text-sm text-[#5C6F80] mt-1 max-w-xl">
@@ -199,9 +199,9 @@ export const ShoppingLogView: React.FC<ShoppingLogViewProps> = ({
         </div>
 
         <div className="bg-white/15 backdrop-blur-md p-4 rounded-2xl border border-white/20 text-right min-w-[200px] shrink-0">
-          <span className="text-[11px] text-white/80 uppercase font-semibold block">Total Dibelanja (Disetujui)</span>
+          <span className="text-xs text-white/80 uppercase font-semibold block">Total Dibelanja (Disetujui)</span>
           <span className="text-xl font-bold font-heading">Rp {totalSpentBought.toLocaleString('id-ID')}</span>
-          <span className="text-[10px] text-white/70 block mt-1">
+          <span className="text-xs text-white/70 block mt-1">
             {totalCoolingCount} barang masih dalam daftar tunda
           </span>
         </div>
@@ -216,7 +216,7 @@ export const ShoppingLogView: React.FC<ShoppingLogViewProps> = ({
               {t.patternAnalysisTitle}
             </h2>
           </div>
-          <span className="text-[11px] text-[#7A8C9E]">
+          <span className="text-xs text-[#7A8C9E]">
             {items.length >= 3 
               ? (language === 'id' ? 'Berdasarkan Data Riil' : 'Based on Real Records') 
               : (language === 'id' ? 'Data Belum Cukup' : 'Insufficient Data')}
@@ -239,7 +239,7 @@ export const ShoppingLogView: React.FC<ShoppingLogViewProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             
             <div className="p-4 rounded-2xl bg-white border border-[#E5ECF2] space-y-1">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-[#7A8C9E]">{t.patternHabit1}</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-[#7A8C9E]">{t.patternHabit1}</p>
               <p className="text-xl font-heading font-extrabold text-[#24303E]">{byeRatio}% {language === 'id' ? 'Lolos dari Impuls' : 'Impulse Resisted'}</p>
               <p className="text-xs text-[#5C6F80]">
                 {byeRatio >= 50 
@@ -249,7 +249,7 @@ export const ShoppingLogView: React.FC<ShoppingLogViewProps> = ({
             </div>
 
             <div className="p-4 rounded-2xl bg-white border border-[#E5ECF2] space-y-1">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-[#7A8C9E]">{t.patternHabit2}</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-[#7A8C9E]">{t.patternHabit2}</p>
               <p className="text-xl font-heading font-extrabold text-[#E11D48]">{topCategoryName}</p>
               <p className="text-xs text-[#5C6F80]">
                 {language === 'id'
@@ -259,7 +259,7 @@ export const ShoppingLogView: React.FC<ShoppingLogViewProps> = ({
             </div>
 
             <div className="p-4 rounded-2xl bg-white border border-[#E5ECF2] space-y-1">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-[#7A8C9E]">{t.patternHabit3}</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-[#7A8C9E]">{t.patternHabit3}</p>
               <p className="text-sm font-bold text-[#6B8BA4]">{language === 'id' ? 'Aturan 30 Hari Sinking Fund' : '30-Day Sinking Fund Rule'}</p>
               <p className="text-xs text-[#5C6F80]">
                 {language === 'id'
@@ -365,7 +365,7 @@ export const ShoppingLogView: React.FC<ShoppingLogViewProps> = ({
             <div className="hidden md:block bg-white rounded-3xl border border-[#E2EAF0] overflow-hidden shadow-xs">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-[#F8F6F2] border-b border-[#E8EFF5] text-[#7A8C9E] uppercase font-bold text-[10px] tracking-wider">
+                  <thead className="bg-[#F8F6F2] border-b border-[#E8EFF5] text-[#7A8C9E] uppercase font-bold text-xs tracking-wider">
                     <tr>
                       <th className="px-6 py-3.5">{t.tableColProduct}</th>
                       <th className="px-6 py-3.5">{t.tableColPrice}</th>
@@ -385,37 +385,37 @@ export const ShoppingLogView: React.FC<ShoppingLogViewProps> = ({
                         <tr key={item.id} className="hover:bg-[#FBFBFA] transition-colors">
                           <td className="px-6 py-4">
                             <p className="font-bold text-[#24303E]">{item.productName}</p>
-                            <span className="text-[11px] text-[#7A8C9E]">
+                            <span className="text-xs text-[#7A8C9E]">
                               {categoryLabels[item.category]?.[language] || item.category}
                             </span>
                             {item.notes && (
-                              <p className="text-[10px] text-[#607485] italic mt-0.5">"{item.notes}"</p>
+                              <p className="text-xs text-[#607485] italic mt-0.5">"{item.notes}"</p>
                             )}
                           </td>
                           <td className="px-6 py-4 font-bold text-[#24303E]">
                             Rp {item.price.toLocaleString('id-ID')}
                           </td>
-                          <td className="px-6 py-4 uppercase text-[#55697A] font-semibold text-[11px]">
+                          <td className="px-6 py-4 uppercase text-[#55697A] font-semibold text-xs">
                             {item.paymentMethod}
                           </td>
                           <td className="px-6 py-4">
                             {isBought && (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#ECFDF5] text-[#065F46] border border-[#10B981] font-bold text-[11px]">
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#ECFDF5] text-[#065F46] border border-[#10B981] font-bold text-xs">
                                 <CheckCircle2 className="w-3 h-3 text-[#059669]" /> {language === 'id' ? 'DIBELI (BUY)' : 'BOUGHT'}
                               </span>
                             )}
                             {isSaved && (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#FFF1F2] text-[#9F1239] border border-[#F43F5E] font-bold text-[11px]">
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#FFF1F2] text-[#9F1239] border border-[#F43F5E] font-bold text-xs">
                                 <XCircle className="w-3 h-3 text-[#E11D48]" /> {language === 'id' ? 'BYE (HEMAT)' : 'BYE (SAVED)'}
                               </span>
                             )}
                             {isCooling && (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#EEF2FF] text-[#3730A3] border border-[#818CF8] font-bold text-[11px]">
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#EEF2FF] text-[#3730A3] border border-[#818CF8] font-bold text-xs">
                                 <Clock className="w-3 h-3 text-[#6366F1]" /> {language === 'id' ? 'TUNDA (COOLING)' : 'COOLING OFF'}
                               </span>
                             )}
                           </td>
-                          <td className="px-6 py-4 text-[#7A8C9E] text-[11px]">
+                          <td className="px-6 py-4 text-[#7A8C9E] text-xs">
                             {new Date(item.date).toLocaleDateString(language === 'id' ? 'id-ID' : 'en-US', {
                               day: 'numeric',
                               month: 'short',
@@ -453,7 +453,7 @@ export const ShoppingLogView: React.FC<ShoppingLogViewProps> = ({
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div>
-                        <span className="text-[10px] uppercase font-bold text-[#7A8C9E] tracking-wider">
+                        <span className="text-xs uppercase font-bold text-[#7A8C9E] tracking-wider">
                           {categoryLabels[item.category]?.[language] || item.category} · {item.paymentMethod.toUpperCase()}
                         </span>
                         <h4 className="font-bold text-sm text-[#24303E] leading-snug mt-0.5">
@@ -471,7 +471,7 @@ export const ShoppingLogView: React.FC<ShoppingLogViewProps> = ({
 
                     <div className="flex items-center justify-between pt-1 border-t border-[#F0F4F7]">
                       <div>
-                        <span className="text-[10px] text-[#7A8C9E] block">Nominal:</span>
+                        <span className="text-xs text-[#7A8C9E] block">Nominal:</span>
                         <span className="text-sm font-extrabold text-[#24303E]">
                           Rp {item.price.toLocaleString('id-ID')}
                         </span>
@@ -479,21 +479,21 @@ export const ShoppingLogView: React.FC<ShoppingLogViewProps> = ({
 
                       <div className="text-right">
                         {isBought && (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#ECFDF5] text-[#065F46] border border-[#10B981] font-bold text-[10px]">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#ECFDF5] text-[#065F46] border border-[#10B981] font-bold text-xs">
                             <CheckCircle2 className="w-3 h-3 text-[#059669]" /> {language === 'id' ? 'DIBELI' : 'BOUGHT'}
                           </span>
                         )}
                         {isSaved && (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#FFF1F2] text-[#9F1239] border border-[#F43F5E] font-bold text-[10px]">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#FFF1F2] text-[#9F1239] border border-[#F43F5E] font-bold text-xs">
                             <XCircle className="w-3 h-3 text-[#E11D48]" /> {language === 'id' ? 'BYE' : 'BYE'}
                           </span>
                         )}
                         {isCooling && (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#EEF2FF] text-[#3730A3] border border-[#818CF8] font-bold text-[10px]">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#EEF2FF] text-[#3730A3] border border-[#818CF8] font-bold text-xs">
                             <Clock className="w-3 h-3 text-[#6366F1]" /> {language === 'id' ? 'TUNDA' : 'PAUSED'}
                           </span>
                         )}
-                        <span className="text-[10px] text-[#7A8C9E] block mt-0.5">
+                        <span className="text-xs text-[#7A8C9E] block mt-0.5">
                           {new Date(item.date).toLocaleDateString(language === 'id' ? 'id-ID' : 'en-US', {
                             day: 'numeric',
                             month: 'short'
@@ -503,7 +503,7 @@ export const ShoppingLogView: React.FC<ShoppingLogViewProps> = ({
                     </div>
 
                     {item.notes && (
-                      <p className="text-[11px] text-[#607485] italic bg-[#F8F6F2] p-2 rounded-xl border border-[#EDE9E3]">
+                      <p className="text-xs text-[#607485] italic bg-[#F8F6F2] p-2 rounded-xl border border-[#EDE9E3]">
                         "{item.notes}"
                       </p>
                     )}

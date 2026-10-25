@@ -48,7 +48,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     { id: 'evaluate', label: t.navEvaluate, icon: ShoppingBag },
     { id: 'monthly-report', label: t.navMonthlyReport, icon: BarChart3 },
     { id: 'history', label: t.navHistory, icon: History },
-    { id: 'education', label: t.navEducation, icon: BookOpen },
+    { id: 'education', label: language === 'id' ? 'Edukasi & Teman Finansial' : 'Education & AI', icon: BookOpen, hasAi: true },
     { id: 'about', label: t.navAbout, icon: Info },
   ];
 
@@ -71,8 +71,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               <ShoppingBag className="w-5 h-5 text-white" />
             </div>
             <div>
-              <span className="font-heading font-extrabold text-xl tracking-tight">
-                <span className="text-[#16A34A]">Buy</span> <span className="text-black font-normal">or</span> <span className="text-[#EC4899]">Bye</span>
+              <span className="font-berkshire text-2xl tracking-wide flex items-center gap-1.5 leading-none">
+                <span className="text-[#16A34A]">Buy</span> <span className="text-[#24303E] font-normal text-lg">or</span> <span className="text-[#EC4899]">Bye</span>
               </span>
               <p className="text-[10px] uppercase font-semibold tracking-wider text-[#6B8BA4] hidden sm:block">
                 Decision Gatekeeper
@@ -80,8 +80,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
           </div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-1">
+          {/* Desktop Navigation with Balanced & Equal Proportions */}
+          <nav className="hidden lg:flex items-center gap-1.5">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = currentView === item.id;
@@ -89,13 +89,13 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <button
                   key={item.id}
                   onClick={() => handleNavClick(item.id)}
-                  className={`flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg transition-all ${
+                  className={`flex items-center justify-center gap-2 px-3.5 py-2 min-h-[38px] text-xs font-semibold rounded-xl transition-all cursor-pointer whitespace-nowrap ${
                     isActive 
-                      ? 'bg-[#E2EAF0] text-[#24303E] font-semibold shadow-xs' 
+                      ? 'bg-[#E2EAF0] text-[#24303E] ring-1 ring-[#CBD7E2] shadow-xs' 
                       : 'text-[#506272] hover:text-[#24303E] hover:bg-[#EFECE6]'
                   }`}
                 >
-                  <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-[#6B8BA4]' : 'text-[#8CA8BF]'}`} />
+                  <Icon className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-[#6B8BA4]' : 'text-[#8CA8BF]'}`} />
                   <span>{item.label}</span>
                 </button>
               );

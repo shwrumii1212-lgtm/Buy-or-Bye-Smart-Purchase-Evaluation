@@ -46,6 +46,21 @@ import {
 export default function App() {
   const [language, setLanguage] = useState<Language>('id');
   const [currentView, setCurrentView] = useState<string>('home');
+  const [educationInitialTab, setEducationInitialTab] = useState<'needs_wants' | 'paylater' | 'emergency' | 'impulse' | 'articles' | 'ai_assistant'>('needs_wants');
+
+  const handleNavigate = (view: string) => {
+    if (view === 'education-ai' || view === 'education:ai_assistant' || view === 'teman-finansial') {
+      setEducationInitialTab('ai_assistant');
+      setCurrentView('education');
+      return;
+    }
+    if (view === 'education') {
+      // Default education entry
+      setCurrentView('education');
+      return;
+    }
+    setCurrentView(view);
+  };
   const [user, setUser] = useState<User | null>(null);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [finance, setFinance] = useState<FinancialProfile | null>(null);
@@ -181,7 +196,7 @@ export default function App() {
       {/* Primary Navigation */}
       <Navbar
         currentView={currentView}
-        onNavigate={setCurrentView}
+        onNavigate={handleNavigate}
         language={language}
         onToggleLanguage={handleToggleLanguage}
         user={user}
@@ -205,8 +220,8 @@ export default function App() {
                 <Lock className="w-3.5 h-3.5 text-[#6B8BA4]" />
                 Autentikasi Diperlukan
               </span>
-              <h1 className="font-heading text-2xl sm:text-3xl font-extrabold text-[#24303E]">
-                Selamat Datang di <span className="text-[#16A34A]">Buy</span> <span className="text-black font-semibold">or</span> <span className="text-[#EC4899]">Bye</span>
+              <h1 className="font-berkshire text-2xl sm:text-3xl font-extrabold text-[#24303E]">
+                Selamat Datang di <span className="font-berkshire tracking-wide inline-flex items-center gap-1.5"><span className="text-[#16A34A]">Buy</span> <span className="text-[#24303E] font-normal text-lg">or</span> <span className="text-[#EC4899]">Bye</span></span>
               </h1>
               <p className="text-xs sm:text-sm text-[#5C6F80] max-w-md mx-auto leading-relaxed">
                 Silakan masuk atau buat akun terlebih dahulu untuk mengakses dashboard keuangan, evaluasi belanja, dan riwayat keputusanmu.
@@ -246,7 +261,7 @@ export default function App() {
             {currentView === 'home' && (
               <HomeView
                 language={language}
-                onNavigate={setCurrentView}
+                onNavigate={handleNavigate}
                 finance={finance}
                 savedMoneyTotal={totalSavedMoney}
               />
@@ -258,7 +273,7 @@ export default function App() {
                 userName={user.name}
                 finance={finance}
                 language={language}
-                onNavigate={setCurrentView}
+                onNavigate={handleNavigate}
                 onSaveEvaluation={handleSaveEvaluation}
                 onSaveToHistory={handleSaveToHistory}
               />
@@ -270,7 +285,7 @@ export default function App() {
                 language={language}
                 userName={user.name}
                 shoppingItems={shoppingLog}
-                onNavigate={setCurrentView}
+                onNavigate={handleNavigate}
                 onUpdateFinance={handleUpdateFinance}
               />
             )}
@@ -281,7 +296,7 @@ export default function App() {
                 userName={user.name}
                 items={shoppingLog}
                 language={language}
-                onNavigate={setCurrentView}
+                onNavigate={handleNavigate}
                 onAddItem={handleAddManualShoppingItem}
                 onDeleteItem={handleDeleteShoppingLogItem}
               />
@@ -293,21 +308,25 @@ export default function App() {
                 shoppingItems={shoppingLog}
                 userName={user.name}
                 language={language}
-                onNavigate={setCurrentView}
+                onNavigate={handleNavigate}
               />
             )}
 
             {currentView === 'education' && (
               <EducationDashboardView
                 language={language}
-                onNavigate={setCurrentView}
+                onNavigate={handleNavigate}
+                user={user}
+                finance={finance}
+                initialTab={educationInitialTab}
               />
             )}
 
             {currentView === 'about' && (
               <AboutUsView
                 language={language}
-                onNavigate={setCurrentView}
+                onNavigate={handleNavigate}
+                user={user}
               />
             )}
           </>
@@ -318,7 +337,7 @@ export default function App() {
       {/* Global Footer */}
       <Footer
         language={language}
-        onNavigate={setCurrentView}
+        onNavigate={handleNavigate}
         onToggleLanguage={handleToggleLanguage}
       />
 
@@ -326,7 +345,7 @@ export default function App() {
       {user && (
         <MobileBottomNav
           currentView={currentView}
-          onNavigate={setCurrentView}
+          onNavigate={handleNavigate}
           language={language}
         />
       )}

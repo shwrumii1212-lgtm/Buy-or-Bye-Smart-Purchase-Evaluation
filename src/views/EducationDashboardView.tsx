@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { 
-  BookOpen, 
+  BookOpen,
+  Scale,
+  Bot, 
   Sparkles, 
   HelpCircle, 
   AlertTriangle, 
@@ -20,21 +22,35 @@ import {
   X,
   Tag
 } from 'lucide-react';
-import { Language } from '../types';
+import { Language, User, FinancialProfile } from '../types';
+import { FinancialAiAssistant } from '../components/FinancialAiAssistant';
 import { translations } from '../utils/translations';
 import { EDUCATIONAL_ARTICLES, EducationalArticle } from '../utils/articlesData';
 
 interface EducationDashboardViewProps {
   language: Language;
   onNavigate?: (view: string) => void;
+  user?: User | null;
+  finance?: FinancialProfile | null;
+  initialTab?: 'needs_wants' | 'paylater' | 'emergency' | 'impulse' | 'articles' | 'ai_assistant';
 }
 
 export const EducationDashboardView: React.FC<EducationDashboardViewProps> = ({
   language,
   onNavigate,
+  user = null,
+  finance = null,
+  initialTab = 'needs_wants',
 }) => {
   const t = translations[language];
-  const [activeTab, setActiveTab] = useState<'needs_wants' | 'paylater' | 'emergency' | 'impulse' | 'articles'>('needs_wants');
+  const [activeTab, setActiveTab] = useState<'needs_wants' | 'paylater' | 'emergency' | 'impulse' | 'articles' | 'ai_assistant'>(initialTab);
+
+  // Sync when initialTab changes
+  React.useEffect(() => {
+    if (initialTab) {
+      setActiveTab(initialTab);
+    }
+  }, [initialTab]);
   
   // Articles state
   const [articleCategory, setArticleCategory] = useState<string>('all');
@@ -143,16 +159,24 @@ export const EducationDashboardView: React.FC<EducationDashboardViewProps> = ({
     }));
   };
 
-  // Paylater interactive calculator
-  const [calcPrice, setCalcPrice] = useState(1500000);
-  const [calcTenor, setCalcTenor] = useState(6);
-  const [calcMonthlyRate, setCalcMonthlyRate] = useState(2.95);
+  // Paylater interactive calculator: ALL fields start completely empty/blank
+  const [calcPrice, setCalcPrice] = useState<number | ''>('');
+  const [calcTenor, setCalcTenor] = useState<number | ''>('');
+  const [calcMonthlyRate, setCalcMonthlyRate] = useState<number | ''>('');
 
-  const paylaterTotalFee = Math.round(calcPrice * (calcMonthlyRate / 100) * calcTenor);
-  const paylaterAdminFee = 25000; // biaya admin transaksi
-  const paylaterGrandTotal = calcPrice + paylaterTotalFee + paylaterAdminFee;
-  const paylaterMonthlyPayment = Math.round(paylaterGrandTotal / calcTenor);
-  const paylaterOverpayPercent = Number((((paylaterGrandTotal - calcPrice) / calcPrice) * 100).toFixed(1));
+  const numericPrice = typeof calcPrice === 'number' && calcPrice > 0 ? calcPrice : 0;
+  const numericTenor = typeof calcTenor === 'number' && calcTenor > 0 ? calcTenor : 0;
+  const numericMonthlyRate = typeof calcMonthlyRate === 'number' && calcMonthlyRate >= 0 ? calcMonthlyRate : 0;
+
+  // Only calculate when user has actually entered price and tenor
+  const isPaylaterCalculated = numericPrice > 0 && numericTenor > 0;
+  const paylaterTotalFee = isPaylaterCalculated ? Math.round(numericPrice * (numericMonthlyRate / 100) * numericTenor) : 0;
+  const paylaterAdminFee = isPaylaterCalculated ? 25000 : 0; // biaya admin transaksi jika harga & tenor diisi
+  const paylaterGrandTotal = isPaylaterCalculated ? numericPrice + paylaterTotalFee + paylaterAdminFee : 0;
+  const paylaterMonthlyPayment = isPaylaterCalculated ? Math.round(paylaterGrandTotal / numericTenor) : 0;
+  const paylaterOverpayPercent = isPaylaterCalculated 
+    ? Number((((paylaterGrandTotal - numericPrice) / numericPrice) * 100).toFixed(1)) 
+    : 0;
 
   return (
     <div className="space-y-8 pb-16">
@@ -175,7 +199,7 @@ export const EducationDashboardView: React.FC<EducationDashboardViewProps> = ({
           <BookOpen className="w-3.5 h-3.5 text-[#6B8BA4]" />
           <span>Mindset & Literacy</span>
         </div>
-        <h1 className="font-heading text-2xl sm:text-3xl font-extrabold text-[#24303E]">
+        <h1 className="font-berkshire text-2xl sm:text-3xl font-extrabold text-[#24303E]">
           {t.eduTitle}
         </h1>
         <p className="text-xs sm:text-sm text-[#5C6F80] mt-1 max-w-xl">
@@ -184,6 +208,7 @@ export const EducationDashboardView: React.FC<EducationDashboardViewProps> = ({
 
         {/* Tab switchers */}
         <div className="flex flex-wrap items-center gap-2 mt-6 pt-4 border-t border-[#EEF3F7]">
+
           <button
             onClick={() => setActiveTab('needs_wants')}
             className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
@@ -236,8 +261,35 @@ export const EducationDashboardView: React.FC<EducationDashboardViewProps> = ({
             <span>{language === 'id' ? 'Artikel Finansial Terkini' : 'Latest Financial Articles'}</span>
             <span className="px-1.5 py-0.2 rounded-full bg-[#9EAEA2] text-white text-[9px] font-bold">Baru</span>
           </button>
+
+          {/* AI Financial Assistant Tab */}
+          <button
+            onClick={() => setActiveTab('ai_assistant')}
+            className={`flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-heading font-extrabold transition-all cursor-pointer ${
+              activeTab === 'ai_assistant'
+                ? 'bg-gradient-to-r from-[#6B8BA4] to-[#8CA8BF] text-white shadow-md ring-2 ring-[#6B8BA4]/30'
+                : 'bg-[#F0F4F8] text-[#334657] hover:bg-[#E2EAF0]'
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5 text-[#E6F4EA]" />
+            <span>{language === 'id' ? '✨ Teman Finansial' : '✨ Financial Buddy'}</span>
+            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-white/20 text-white font-normal ml-0.5">
+              Live
+            </span>
+          </button>
         </div>
       </div>
+
+      {/* Tab 0: Teman Finansial AI Chat Assistant */}
+      {activeTab === 'ai_assistant' && (
+        <section className="space-y-4 animate-in fade-in">
+          <FinancialAiAssistant
+            language={language}
+            user={user}
+            finance={finance}
+          />
+        </section>
+      )}
 
       {/* Tab 1: Needs vs Wants Interactive Sorter */}
       {activeTab === 'needs_wants' && (
@@ -391,9 +443,13 @@ export const EducationDashboardView: React.FC<EducationDashboardViewProps> = ({
                   <input
                     type="number"
                     step="100000"
-                    value={calcPrice}
-                    onChange={(e) => setCalcPrice(Number(e.target.value) || 0)}
-                    className="w-full pl-10 pr-4 py-2 text-xs font-semibold rounded-xl border border-[#CFDCE6] bg-[#FBFBFA]"
+                    placeholder="Masukkan harga barang (misal: 1500000)"
+                    value={calcPrice === '' ? '' : calcPrice}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setCalcPrice(val === '' ? '' : Number(val));
+                    }}
+                    className="w-full pl-10 pr-4 py-2 text-xs font-semibold rounded-xl border border-[#CFDCE6] bg-[#FBFBFA] focus:ring-2 focus:ring-[#6B8BA4]/30"
                   />
                 </div>
               </div>
@@ -401,13 +457,17 @@ export const EducationDashboardView: React.FC<EducationDashboardViewProps> = ({
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-[#24303E] mb-1">
-                    Tenor Cicilan
+                    Jangka Waktu / Tenor
                   </label>
                   <select
-                    value={calcTenor}
-                    onChange={(e) => setCalcTenor(Number(e.target.value))}
-                    className="w-full px-3 py-2 text-xs rounded-xl border border-[#CFDCE6] bg-[#FBFBFA]"
+                    value={calcTenor === '' ? '' : calcTenor}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setCalcTenor(val === '' ? '' : Number(val));
+                    }}
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-[#CFDCE6] bg-[#FBFBFA] focus:ring-2 focus:ring-[#6B8BA4]/30"
                   >
+                    <option value="">Pilih Tenor...</option>
                     <option value={1}>1 Bulan</option>
                     <option value={3}>3 Bulan</option>
                     <option value={6}>6 Bulan</option>
@@ -422,9 +482,13 @@ export const EducationDashboardView: React.FC<EducationDashboardViewProps> = ({
                   <input
                     type="number"
                     step="0.1"
-                    value={calcMonthlyRate}
-                    onChange={(e) => setCalcMonthlyRate(Number(e.target.value) || 0)}
-                    className="w-full px-3 py-2 text-xs rounded-xl border border-[#CFDCE6] bg-[#FBFBFA]"
+                    placeholder="Contoh: 2.95"
+                    value={calcMonthlyRate === '' ? '' : calcMonthlyRate}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setCalcMonthlyRate(val === '' ? '' : Number(val));
+                    }}
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-[#CFDCE6] bg-[#FBFBFA] focus:ring-2 focus:ring-[#6B8BA4]/30"
                   />
                 </div>
               </div>
@@ -442,37 +506,53 @@ export const EducationDashboardView: React.FC<EducationDashboardViewProps> = ({
 
             {/* Calculated Visual Result Box */}
             <div className="p-6 rounded-3xl bg-[#F8F6F2] border border-[#E5ECF2] flex flex-col justify-between space-y-6">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between pb-3 border-b border-[#E0E7ED]">
-                  <span className="text-xs text-[#7A8C9E]">Harga Asli (Tunai)</span>
-                  <span className="text-sm font-bold text-[#24303E]">Rp {calcPrice.toLocaleString('id-ID')}</span>
-                </div>
+              {isPaylaterCalculated ? (
+                <div className="space-y-4 animate-in fade-in">
+                  <div className="flex items-center justify-between pb-3 border-b border-[#E0E7ED]">
+                    <span className="text-xs text-[#7A8C9E]">Harga Asli (Tunai)</span>
+                    <span className="text-sm font-bold text-[#24303E]">Rp {numericPrice.toLocaleString('id-ID')}</span>
+                  </div>
 
-                <div className="flex items-center justify-between pb-3 border-b border-[#E0E7ED]">
-                  <span className="text-xs text-[#7A8C9E]">Total Bunga & Biaya Layanan</span>
-                  <span className="text-sm font-bold text-[#D8A4B8]">
-                    + Rp {(paylaterTotalFee + paylaterAdminFee).toLocaleString('id-ID')} ({paylaterOverpayPercent}%)
-                  </span>
-                </div>
+                  <div className="flex items-center justify-between pb-3 border-b border-[#E0E7ED]">
+                    <span className="text-xs text-[#7A8C9E]">Total Bunga & Biaya Layanan</span>
+                    <span className="text-sm font-bold text-[#D8A4B8]">
+                      + Rp {(paylaterTotalFee + paylaterAdminFee).toLocaleString('id-ID')} ({paylaterOverpayPercent}%)
+                    </span>
+                  </div>
 
-                <div className="flex items-center justify-between pb-3 border-b border-[#E0E7ED]">
-                  <span className="text-xs font-bold text-[#24303E]">Total yang Sebenarnya Kamu Bayar</span>
-                  <span className="text-xl font-heading font-black text-[#24303E]">
-                    Rp {paylaterGrandTotal.toLocaleString('id-ID')}
-                  </span>
-                </div>
+                  <div className="flex items-center justify-between pb-3 border-b border-[#E0E7ED]">
+                    <span className="text-xs font-bold text-[#24303E]">Total yang Sebenarnya Kamu Bayar</span>
+                    <span className="text-xl font-heading font-black text-[#24303E]">
+                      Rp {paylaterGrandTotal.toLocaleString('id-ID')}
+                    </span>
+                  </div>
 
-                <div className="p-4 rounded-2xl bg-white border border-[#DCE5ED] text-center">
-                  <p className="text-[11px] text-[#7A8C9E] uppercase font-bold">Cicilan Wajib Tiap Bulan ({calcTenor}x)</p>
-                  <p className="text-2xl font-heading font-extrabold text-[#6B8BA4] mt-0.5">
-                    Rp {paylaterMonthlyPayment.toLocaleString('id-ID')} <span className="text-xs font-normal text-[#7A8C9E]">/ bulan</span>
+                  <div className="p-4 rounded-2xl bg-white border border-[#DCE5ED] text-center">
+                    <p className="text-[11px] text-[#7A8C9E] uppercase font-bold">Cicilan Wajib Tiap Bulan ({numericTenor}x)</p>
+                    <p className="text-2xl font-heading font-extrabold text-[#6B8BA4] mt-0.5">
+                      Rp {paylaterMonthlyPayment.toLocaleString('id-ID')} <span className="text-xs font-normal text-[#7A8C9E]">/ bulan</span>
+                    </p>
+                  </div>
+
+                  <p className="text-[11px] text-[#7A8C9E] text-center italic pt-2">
+                    *Simpan uangmu dan bayar lunas tunai untuk menghemat Rp {(paylaterTotalFee + paylaterAdminFee).toLocaleString('id-ID')}.
                   </p>
                 </div>
-              </div>
-
-              <p className="text-[11px] text-[#7A8C9E] text-center italic">
-                *Simpan uangmu dan bayar lunas tunai untuk menghemat Rp {(paylaterTotalFee + paylaterAdminFee).toLocaleString('id-ID')}.
-              </p>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-12 text-center space-y-3">
+                  <div className="w-12 h-12 rounded-2xl bg-[#E2EAF0] text-[#6B8BA4] flex items-center justify-center">
+                    <Scale className="w-6 h-6" />
+                  </div>
+                  <h4 className="font-heading font-bold text-sm text-[#24303E]">
+                    {language === 'id' ? 'Kalkulator Belum Terisi' : 'Calculator is Blank'}
+                  </h4>
+                  <p className="text-xs text-[#7A8C9E] max-w-xs leading-relaxed">
+                    {language === 'id' 
+                      ? 'Masukkan nominal harga produk di sebelah kiri untuk melihat simulasi bunga, biaya layanan, dan cicilan bulanan PayLater.'
+                      : 'Enter a product price on the left to simulate fees, interest, and monthly installments.'}
+                  </p>
+                </div>
+              )}
             </div>
 
           </div>

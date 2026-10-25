@@ -52,10 +52,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
             <span className="text-[#847594]">Gen Z Mindful Spending</span>
           </div>
 
-          <h1 className="font-heading text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[#24303E] leading-[1.15]">
+          <h1 className="font-berkshire text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[#24303E] leading-[1.15]">
             {t.heroTitle}
-            <span className="block mt-1">
-              <span className="text-[#16A34A]">Buy</span> <span className="text-black font-semibold">or</span> <span className="text-[#EC4899]">Bye?</span>
+            <span className="block mt-2 tracking-wide">
+              <span className="text-[#16A34A]">Buy</span> <span className="text-[#24303E] font-normal text-3xl sm:text-5xl lg:text-6xl mx-1.5">or</span> <span className="text-[#EC4899]">Bye?</span>
             </span>
           </h1>
 
@@ -82,7 +82,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </div>
           )}
 
-          {/* Action CTAs: Highlighting Atur Profil Keuangan first */}
+          {/* Action CTAs: Highlighting Atur Profil Keuangan first, all sharing identical font-heading typography */}
           <div className="mt-7 flex flex-wrap items-center gap-3.5">
             {/* Primary Highlighted Button: Atur Profil Keuangan */}
             <button
@@ -100,7 +100,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             {/* Secondary Button: Mulai Evaluasi Barang */}
             <button
               onClick={() => onNavigate('evaluate')}
-              className={`flex items-center gap-2.5 px-6 py-3.5 rounded-2xl border font-semibold text-sm transition-all shadow-xs cursor-pointer ${
+              className={`flex items-center gap-2.5 px-6 py-3.5 rounded-2xl border font-heading font-extrabold text-sm transition-all shadow-xs cursor-pointer ${
                 finance && finance.monthlyIncome > 0
                   ? 'bg-white hover:bg-[#F8F6F2] text-[#24303E] border-[#CBD7E2] hover:border-[#6B8BA4]'
                   : 'bg-white/70 hover:bg-white text-[#506272] border-[#D5DFE7]'
@@ -113,17 +113,18 @@ export const HomeView: React.FC<HomeViewProps> = ({
               </span>
             </button>
 
+            {/* Tertiary Button: Laporan Bulanan */}
             <button
               onClick={() => onNavigate('monthly-report')}
-              className="flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-white hover:bg-[#F8F6F2] text-[#334657] border border-[#CBD7E2] font-semibold text-sm transition-all shadow-xs hover:border-[#6B8BA4] cursor-pointer"
+              className="flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-white hover:bg-[#F8F6F2] text-[#334657] border border-[#CBD7E2] font-heading font-extrabold text-sm transition-all shadow-xs hover:border-[#6B8BA4] cursor-pointer"
             >
               <BarChart3 className="w-4 h-4 text-[#6B8BA4]" />
               <span>{language === 'id' ? 'Laporan Bulanan' : 'Monthly Report'}</span>
             </button>
           </div>
 
-          {/* User Financial Snapshot Badge if exists */}
-          {finance && (
+          {/* User Financial Snapshot Badge: only display when user has filled financial data */}
+          {finance && finance.monthlyIncome > 0 && (
             <div className="mt-8 pt-6 border-t border-[#D5DFE7]/70 flex flex-wrap items-center gap-4 sm:gap-8 text-xs text-[#506272]">
               <div>
                 <span className="text-[11px] text-[#7A8C9E] block">
@@ -155,6 +156,18 @@ export const HomeView: React.FC<HomeViewProps> = ({
               </div>
             </div>
           )}
+        </div>
+      </section>
+
+      {/* Motivation Quote Section (Inspired by Design Reference) */}
+      <section className="p-8 sm:p-12 rounded-3xl bg-white border border-[#E2EAF0] shadow-sm">
+        <div className="relative pl-6 sm:pl-8 py-2 border-l-[3.5px] border-[#D4A359]">
+          <blockquote className="font-quote text-xl sm:text-2xl md:text-[26px] text-[#1E2B37] leading-relaxed md:leading-[1.7] tracking-normal font-normal">
+            &ldquo;We believe a household budget should be a five-minute weekly habit, not a spreadsheet you avoid until the end of the month.&rdquo;
+          </blockquote>
+          <p className="mt-4 text-xs font-semibold text-[#8C7A62] tracking-wider uppercase">
+            — Mindful Financial Philosophy
+          </p>
         </div>
       </section>
 
@@ -195,6 +208,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
           </div>
         </div>
       </section>
+
+      
 
       {/* Why Choose Buy or Bye */}
       <section className="p-8 sm:p-10 rounded-3xl bg-[#F8F6F2] border border-[#E2EAF0]">
@@ -269,6 +284,33 @@ export const HomeView: React.FC<HomeViewProps> = ({
             {language === 'id' ? 'Tes Barang →' : 'Evaluate Item →'}
           </button>
         </div>
+      </section>
+
+      {/* Quick Access Banner: Teman Finansial AI in Edukasi Finansial */}
+      <section className="p-7 sm:p-8 rounded-3xl bg-gradient-to-r from-[#24303E] via-[#314254] to-[#40566D] text-white shadow-md flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
+        <div className="space-y-2 max-w-xl z-10">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 text-white text-xs font-semibold backdrop-blur-xs">
+            <Sparkles className="w-3.5 h-3.5 text-[#B8D5E5]" />
+            <span>{language === 'id' ? 'Asisten Cerdas di Edukasi Finansial' : 'Smart AI in Financial Education'}</span>
+          </div>
+          <h2 className="font-heading font-extrabold text-xl sm:text-2xl text-white">
+            {language === 'id' ? 'Ada Keraguan Belanja? Diskusi Bareng Teman Finansial' : 'Money Questions? Chat with Financial Buddy'}
+          </h2>
+          <p className="text-xs sm:text-sm text-[#D5DFE7] leading-relaxed">
+            {language === 'id'
+              ? 'Tanyakan tips budgeting, cara menahan lapar mata saat diskon, atau simulasi cicilan paylater dengan bahasa santai, ramah, dan tanpa dihakimi.'
+              : 'Ask anything about budgeting, curbing impulse buys, or loans in a friendly, zero-judgment chat.'}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => onNavigate('teman-finansial')}
+          className="z-10 inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-[#6B8BA4] hover:bg-[#587893] text-white font-heading font-extrabold text-xs sm:text-sm shadow-md transition-all cursor-pointer shrink-0 hover:-translate-y-0.5 active:translate-y-0 ring-2 ring-white/20"
+        >
+          <Sparkles className="w-4 h-4" />
+          <span>{language === 'id' ? 'Buka Teman Finansial' : 'Open Financial Buddy'}</span>
+          <ArrowRight className="w-4 h-4 ml-0.5" />
+        </button>
       </section>
 
     </div>
